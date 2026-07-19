@@ -30,6 +30,9 @@ describe('direct layer: IDs', () => {
   it('detects a labeled ID', () => {
     expect(categories('Student ID: 20231234 was assigned.')).toContain('id');
   });
+  it('detects a transcript-style student number (corpus: reported transcript miss)', () => {
+    expect(categories('Student Number: 830417 Grade: 11')).toContain('id');
+  });
 });
 
 describe('direct layer: dates', () => {

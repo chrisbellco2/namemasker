@@ -322,6 +322,13 @@ button.primary:hover { background: var(--verdigris-deep); }
 #summary-counts .kind-name { color: var(--iris); }
 #summary-counts .kind-contextual { color: var(--amber); }
 .count-pending { color: var(--ink-soft); font-weight: 400; }
+.count-map { color: var(--verdigris-deep); font-weight: 600; }
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+button:disabled:hover { background: var(--card); }
 .summary-hint { color: var(--ink-soft); flex: 1 1 14rem; font-size: 0.85rem; }
 .summary-actions { display: flex; gap: 0.4rem; }
 .summary-actions button { font-size: 0.85rem; padding: 0.25rem 0.6rem; }

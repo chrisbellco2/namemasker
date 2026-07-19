@@ -37,7 +37,9 @@ const RULES: DirectRule[] = [
     category: 'id',
     placeholderType: 'id',
     reason: 'Labeled ID number (deterministic pattern)',
-    patterns: [/\b(?:student\s+id|id(?:\s+(?:number|no))?|case\s+(?:number|no))\s*[#:.]?\s*\d{4,12}\b/gi],
+    patterns: [
+      /\b(?:student\s+(?:id|number|no)|id(?:\s+(?:number|no))?|case\s+(?:number|no))\s*[#:.]?\s*\d{4,12}\b/gi,
+    ],
   },
   {
     category: 'date',

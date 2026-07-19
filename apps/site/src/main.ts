@@ -604,10 +604,21 @@ function renderSummary(): void {
     span.textContent = `${glyph} ${count}`;
     summaryCounts.append(span);
   }
+  const fromMap = uiFlags.filter((f) => f.fromMap).length;
+  if (fromMap > 0) {
+    const mapSpan = document.createElement('span');
+    mapSpan.className = 'count-map';
+    mapSpan.textContent = `${fromMap} from your map`;
+    summaryCounts.append(mapSpan);
+  }
   const pendingSpan = document.createElement('span');
   pendingSpan.className = 'count-pending';
   pendingSpan.textContent = pending === 0 ? 'all reviewed' : `${pending} pending`;
   summaryCounts.append(pendingSpan);
+
+  const approveAll = $<HTMLButtonElement>('btn-approve-all');
+  approveAll.disabled = pending === 0;
+  approveAll.title = pending === 0 ? 'Nothing pending — every flag is already reviewed' : '';
 
   pendingNote.textContent = pending > 0 ? `${pending} flag${pending === 1 ? '' : 's'} still pending review` : '';
 }
