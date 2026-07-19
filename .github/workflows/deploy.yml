@@ -1,0 +1,54 @@
+# Deploys the built site to the static host over FTPS.
+#
+# Manual-trigger only until Chris confirms the first deploy looks right
+# (CLAUDE.md: "Chris decides at first deploy"). To make it automatic
+# afterward, uncomment the push trigger below.
+#
+# Required repository secrets (Settings -> Secrets and variables -> Actions):
+#   FTP_SERVER      e.g. ftp.example.com
+#   FTP_USERNAME    the host account username
+#   FTP_PASSWORD    the host account password
+#   FTP_SERVER_DIR  remote directory the site serves from, with trailing
+#                   slash, e.g. namemasker.com/
+name: deploy
+
+on:
+  workflow_dispatch:
+  # push:
+  #   branches: [main]
+  #   paths: ['apps/site/**', 'packages/core/**']
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26
+          cache: npm
+
+      - name: Install (exact lockfile)
+        run: npm ci
+
+      - name: Test core
+        run: npm test
+
+      - name: Build site
+        run: npm -w @namemasker/site run build
+
+      # Pinned to the v4.4.0 commit SHA per dependency policy.
+      - name: Upload dist over FTPS
+        uses: SamKirkland/FTP-Deploy-Action@110f9186c050f71550953127052e77650219c287
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          local-dir: apps/site/dist/
+          server-dir: ${{ secrets.FTP_SERVER_DIR }}

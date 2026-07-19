@@ -56,3 +56,14 @@ content hash of dist, keeping builds deterministic for Phase 6.
 Chris's call. github.com/chrisbellco2/namemasker starts private; flip to
 public when the site is reviewed and live, consistent with the open-source
 trust posture without exposing half-built work.
+
+## 8. Deploy: GitHub Action -> FTPS to the existing static host (2026-07-18)
+
+Chris's host takes FTP uploads, so first deploy target is that host rather
+than Vercel. A GitHub Action builds the site (npm ci from the exact
+lockfile, tests must pass) and uploads apps/site/dist over FTPS via
+SamKirkland/FTP-Deploy-Action, pinned to a commit SHA per dependency
+policy. Credentials are GitHub repository secrets that only Chris enters.
+Manual-trigger (workflow_dispatch) until the first deploy is confirmed
+good; then the push-to-main trigger gets uncommented. If the host turns
+out to support SSH/SFTP (Dreamhost does), switch to rsync over SSH.
