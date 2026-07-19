@@ -74,22 +74,33 @@ The AI services you should be cautious about are hosted ones: your text travels 
 
 **Q: How can I be sure I can trust it?**
 
-NameMasker is a website, but it doesn't work like one. A normal website
-sends what you type to a server; this page, once loaded, sends nothing
-anywhere. Every step — finding names, masking them, restoring them —
-happens in your browser's own memory, on your machine. There is no server
-waiting on the other end; there is nothing to send to.
+First, a promise — from a person, not a company:
 
-The masking itself is deliberately old-fashioned: find and replace. "Maya
+> I'm Chris Bell, an independent educational consultant. NameMasker is the
+> same masking engine at the heart of the full IEC dashboard I'm building
+> for my own practice — I use it with my own students, and it seemed too
+> useful not to share with the IEC community.
+>
+> This site does not send your documents anywhere — not to me, not to a
+> server, not to any AI company. Nothing you type or open here leaves your
+> computer. And it's free, of course.
+>
+> — Chris
+
+Here's how that can be true. NameMasker is a website, but it doesn't work
+like one. A normal website sends what you type to a server; this page, once
+loaded, sends nothing anywhere. Every step — finding names, masking them,
+restoring them — happens in your browser, on your machine. There is no
+server on the other end. There is nothing to send to.
+
+Most of the work is deliberately old-fashioned: find and replace. "Maya
 Chen" becomes "Student A" the same way your word processor would do it — no
-cleverness, perfectly reversible.
+cleverness, perfectly reversible. One part does use AI: finding the names.
+It's a small language model your browser downloads once and runs by itself,
+like a spell-checker. It reads your document on your computer, and nothing
+is sent out to be read.
 
-One part does use AI: finding the names. It's a small model your browser
-downloads once and then runs by itself, the way it runs a spell-checker. It
-reads your document on your computer — nothing is sent out to be read.
-
-Don't take any of this on faith. Four ways to check, in increasing order of
-rigor:
+A promise is only worth what you can check. Four ways, easiest first:
 
 1. Turn off your internet. Load the page, disconnect, and use the tool. It works fully offline because nothing it does requires a server. This is a two-minute test anyone can run.
 2. Watch the network. Open your browser's developer tools, use the tool, and observe that no requests carry your text anywhere. The only network activity is the one-time download of the application and model.

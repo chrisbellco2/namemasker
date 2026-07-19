@@ -168,3 +168,13 @@ the flip, history was rewritten with git-filter-repo to scrub a real
 student number that had landed in a corpus test and commit message, and to
 redact the shell username, home path, and unrelated-domain details from
 the deploy ADRs. A pre-scrub backup clone was kept locally.
+
+## 13. The trust promise (2026-07-19)
+
+Chris's structure: Promise -> How -> Proof. The trust section now opens
+with a first-person signed promise from Chris, including provenance — the
+same masking engine powers the IEC dashboard he is building for his own
+practice, mentioned generically per the amended charter rule (no name, no
+link, no branding; NameMasker is not a funnel) — and closes with "free, of
+course." The four verification steps remain, reframed as "a promise is
+only worth what you can check."

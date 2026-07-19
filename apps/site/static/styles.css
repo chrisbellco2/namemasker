@@ -667,6 +667,21 @@ button.ph-chip:hover { background: color-mix(in srgb, var(--approved-tint) 70%, 
 .legend-mark.kind-name { background: var(--iris-tint); text-decoration-color: var(--iris); text-decoration-style: dashed; }
 .legend-mark.kind-contextual { background: var(--amber-tint); text-decoration-color: var(--amber); text-decoration-style: dotted; }
 
+.promise {
+  border-left: 4px solid var(--verdigris);
+  background: var(--approved-tint);
+  border-radius: 0 0.6rem 0.6rem 0;
+  padding: 0.9rem 1.1rem;
+  margin: 0.8rem 0 1.1rem;
+}
+.promise p { margin: 0 0 0.6rem; }
+.promise p:last-child { margin-bottom: 0; }
+.promise-sig {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  font-weight: 700;
+  color: var(--verdigris-deep);
+}
+
 .footer {
   max-width: 52rem;
   margin: 0 auto;

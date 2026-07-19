@@ -147,10 +147,15 @@
       <path d="M2 7 C 50 3, 110 10, 158 5" fill="none" stroke="#1f6f60" stroke-width="4.5" stroke-linecap="round"/>
       <path d="M144 6 C 150 5.6, 154 5.4, 158 5.1" fill="none" stroke="#22272b" stroke-width="4.5" stroke-linecap="butt" stroke-dasharray="3.5 4.5"/>
     </svg>
-    <p>NameMasker is a website, but it doesn’t work like one. A normal website sends what you type to a server; this page, once loaded, sends nothing anywhere. Every step — finding names, masking them, restoring them — happens in your browser’s own memory, on your machine. There is no server waiting on the other end; there is nothing to send to.</p>
-    <p>The masking itself is deliberately old-fashioned: find and replace. “Maya Chen” becomes “Student A” the same way your word processor would do it — no cleverness, perfectly reversible.</p>
-    <p>One part does use AI: finding the names. It’s a small model your browser downloads once and then runs by itself, the way it runs a spell-checker. It reads your document on your computer — nothing is sent out to be read.</p>
-    <p>Don’t take any of this on faith. Four ways to check, in increasing order of rigor:</p>
+    <p>First, a promise — from a person, not a company:</p>
+    <div class="promise">
+      <p>I’m Chris Bell, an independent educational consultant. NameMasker is the same masking engine at the heart of the full IEC dashboard I’m building for my own practice — I use it with my own students, and it seemed too useful not to share with the IEC community.</p>
+      <p>This site does not send your documents anywhere — not to me, not to a server, not to any AI company. Nothing you type or open here leaves your computer. And it’s free, of course.</p>
+      <p class="promise-sig">— Chris</p>
+    </div>
+    <p>Here’s how that can be true. NameMasker is a website, but it doesn’t work like one. A normal website sends what you type to a server; this page, once loaded, sends nothing anywhere. Every step — finding names, masking them, restoring them — happens in your browser, on your machine. There is no server on the other end. There is nothing to send to.</p>
+    <p>Most of the work is deliberately old-fashioned: find and replace. “Maya Chen” becomes “Student A” the same way your word processor would do it — no cleverness, perfectly reversible. One part does use AI: finding the names. It’s a small language model your browser downloads once and runs by itself, like a spell-checker. It reads your document on your computer, and nothing is sent out to be read.</p>
+    <p>A promise is only worth what you can check. Four ways, easiest first:</p>
     <ol>
       <li><strong>Turn off your internet.</strong> Load the page, disconnect, and use the tool. It works fully offline because nothing it does requires a server.</li>
       <li><strong>Watch the network.</strong> Open your browser’s developer tools and observe that no request carries your text anywhere.</li>

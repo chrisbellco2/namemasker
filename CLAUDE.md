@@ -6,7 +6,7 @@ This file governs all Claude Code sessions in this repo. Read it fully before an
 
 NameMasker (namemasker.com) is a free, standalone, fully local tool that stages PII redactions in student documents so independent educational consultants (IECs) can safely use hosted AI services. Paste or drop a document, Mask, review staged replacements, approve, copy the cleaned text out. Paste AI output back in, Unmask, and real names return via a local mapping.
 
-Owner: Chris Bell, Bell College Consulting. This is a public giveaway, MIT licensed, deliberately independent of Chris's other products in branding and infrastructure. It shares a core library with his private practice platform, but nothing in this repo references that platform.
+Owner: Chris Bell, Bell College Consulting. This is a public giveaway, MIT licensed, deliberately independent of Chris's other products in branding and infrastructure. It shares a core library with his private practice platform; the site's trust promise may mention that platform generically ("a full IEC dashboard I'm building") as provenance, but never by name, link, or branding — NameMasker must not be anyone's funnel.
 
 ## Governing principles (non-negotiable)
 
