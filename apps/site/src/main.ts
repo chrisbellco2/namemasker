@@ -215,12 +215,18 @@ $<HTMLInputElement>('file-input').addEventListener('change', (e) => {
   if (file) void intakeFile(file);
   (e.target as HTMLInputElement).value = '';
 });
-docInput.addEventListener('dragover', (e) => {
-  e.preventDefault();
-  docInput.classList.add('dropping');
+// Accept drops anywhere on the Mask face — the paste box, the scanned
+// document view, or the surrounding card all work.
+faceMask.addEventListener('dragover', (e) => {
+  if (e.dataTransfer?.types.includes('Files')) {
+    e.preventDefault();
+    docInput.classList.add('dropping');
+  }
 });
-docInput.addEventListener('dragleave', () => docInput.classList.remove('dropping'));
-docInput.addEventListener('drop', (e) => {
+faceMask.addEventListener('dragleave', (e) => {
+  if (!faceMask.contains(e.relatedTarget as Node)) docInput.classList.remove('dropping');
+});
+faceMask.addEventListener('drop', (e) => {
   const file = e.dataTransfer?.files?.[0];
   if (file) {
     e.preventDefault();

@@ -31,26 +31,45 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+// Small shell files go network-first so a deploy is picked up on the very
+// next online load; the heavyweight, rarely-changing assets (model, wasm,
+// fonts) stay cache-first. Offline, everything falls back to cache.
+const SHELL = new Set(['/', '/index.html', '/styles.css', '/app.js', '/ner-worker.js', '/manifest.webmanifest']);
+
 self.addEventListener('fetch', (event) => {
   const request = event.request;
   if (request.method !== 'GET') return;
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
+
+  const putCopy = (response) => {
+    if (response.ok) {
+      const copy = response.clone();
+      caches.open(CACHE).then((cache) => cache.put(request, copy));
+    }
+    return response;
+  };
+
+  if (request.mode === 'navigate' || SHELL.has(url.pathname)) {
+    event.respondWith(
+      fetch(request)
+        .then(putCopy)
+        .catch(async () =>
+          (await caches.match(request, { ignoreSearch: true })) ??
+          (await caches.match('index.html')) ??
+          Response.error(),
+        ),
+    );
+    return;
+  }
+
   event.respondWith(
     caches.match(request, { ignoreSearch: true }).then(
       (cached) =>
         cached ??
         fetch(request)
-          .then((response) => {
-            if (response.ok) {
-              const copy = response.clone();
-              caches.open(CACHE).then((cache) => cache.put(request, copy));
-            }
-            return response;
-          })
-          .catch(() =>
-            request.mode === 'navigate' ? caches.match('index.html') : Response.error(),
-          ),
+          .then(putCopy)
+          .catch(() => Response.error()),
     ),
   );
 });
