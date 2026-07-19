@@ -53,6 +53,6 @@ jobs:
           mkdir -p ~/.ssh
           printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          rsync -az --delete \
+          rsync -az --delete --mkpath \
             -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new" \
             apps/site/dist/ "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH"
