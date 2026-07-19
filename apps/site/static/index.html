@@ -40,9 +40,13 @@
             </span>
             <input type="file" id="file-input" accept=".pdf,.docx,.txt,.md" hidden>
           </div>
-          <textarea id="doc-input" rows="10" placeholder="Paste a document to begin, or drop in a PDF or Word file." spellcheck="false"></textarea>
+          <div class="doc-wrap">
+            <span id="domino-peek" hidden aria-hidden="true"></span>
+            <textarea id="doc-input" rows="10" placeholder="Paste a document to begin, or drop in a PDF or Word file." spellcheck="false"></textarea>
+          </div>
           <div class="actions">
             <button type="button" class="primary" id="btn-mask">Mask</button>
+            <span id="domino-scan" hidden aria-hidden="true"></span>
             <span class="status" id="scan-status" role="status" aria-live="polite"></span>
           </div>
           <p class="status model-status" id="model-status" role="status" aria-live="polite">Preparing the on-device name model…</p>
@@ -117,6 +121,10 @@
 
   <section class="prose">
     <h2>How to use it</h2>
+    <svg class="tail-underline" width="132" height="12" viewBox="0 0 132 12" aria-hidden="true">
+      <path d="M2 7 C 40 3, 90 10, 122 5" fill="none" stroke="#1f6f60" stroke-width="4.5" stroke-linecap="round"/>
+      <path d="M108 6 C 114 5.6, 118 5.4, 122 5.1" fill="none" stroke="#22272b" stroke-width="4.5" stroke-linecap="butt" stroke-dasharray="3.5 4.5"/>
+    </svg>
     <ol>
       <li>Paste your text above, or drop in a PDF or Word document. Files are read on your device and never uploaded.</li>
       <li>Press Mask. Identifying information lights up: names, schools, emails, phone numbers, and passages that might identify the student through context.</li>
@@ -135,6 +143,10 @@
 
   <section class="prose">
     <h2>How you can trust it</h2>
+    <svg class="tail-underline" width="168" height="12" viewBox="0 0 168 12" aria-hidden="true">
+      <path d="M2 7 C 50 3, 110 10, 158 5" fill="none" stroke="#1f6f60" stroke-width="4.5" stroke-linecap="round"/>
+      <path d="M144 6 C 150 5.6, 154 5.4, 158 5.1" fill="none" stroke="#22272b" stroke-width="4.5" stroke-linecap="butt" stroke-dasharray="3.5 4.5"/>
+    </svg>
     <ol>
       <li><strong>Turn off your internet.</strong> Load the page, disconnect, and use the tool. It works fully offline because nothing it does requires a server.</li>
       <li><strong>Watch the network.</strong> Open your browser’s developer tools and observe that no request carries your text anywhere.</li>

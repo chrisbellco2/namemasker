@@ -186,6 +186,38 @@ textarea.dropping {
   outline-offset: -6px;
 }
 
+/* ---- Domino ---- */
+
+.doc-wrap { position: relative; }
+#domino-peek {
+  position: absolute;
+  bottom: -3px;
+  right: 42px;
+  pointer-events: none;
+  line-height: 0;
+}
+@keyframes domino-rise {
+  from { transform: translateY(16px); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+#domino-peek svg { animation: domino-rise 0.5s ease-out both; }
+
+#domino-scan { display: inline-flex; line-height: 0; }
+
+.domino-done { display: inline-flex; line-height: 0; vertical-align: middle; }
+@keyframes domino-pop {
+  from { transform: scale(0.6); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+.domino-done svg { animation: domino-pop 0.45s cubic-bezier(0.2, 1.4, 0.5, 1) both; }
+
+.tail-underline { display: block; margin: -2px 0 10px; }
+
+@media (prefers-reduced-motion: reduce) {
+  #domino-peek svg,
+  .domino-done svg { animation: none; }
+}
+
 textarea {
   width: 100%;
   font: inherit;

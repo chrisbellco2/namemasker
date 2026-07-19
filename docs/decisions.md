@@ -141,3 +141,18 @@ PDFs get an honest "this tool does not read images" error instead of empty
 output. "Cleaned-file download" ships as {original-name}.masked.txt — a
 text file, not a rebuilt PDF/DOCX; regenerating formatted documents
 client-side is out of scope until demand proves it.
+
+## 11. Domino, the mascot (2026-07-19)
+
+Chris approved after three preview rounds. An original raccoon — the
+naturally masked animal — with the mask drawn in verdigris: the brand
+color literally doing the masking. Explicitly NOT an imitation of any
+existing character (the inspiration prompt mentioned Dora's Swiper, who
+is Nickelodeon IP; nothing of that design carried over). Body: option B
+(round ears, glint eyes, small smile). Three moments only, never near
+the flags: peeking inside the empty paste box (tail trailing along the
+border), paws over his eyes while a scan runs — even the mascot doesn't
+look, Chris's idea — and a small pop beside "all reviewed". Section
+headings carry his tail as a ringed underline stroke. All entrances are
+static under prefers-reduced-motion. Hand-drawn inline SVG in
+apps/site/src/domino.ts, palette-fixed, zero dependencies.

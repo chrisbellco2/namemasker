@@ -14,6 +14,7 @@ import {
   type StudentMap,
 } from '@namemasker/core';
 import { extractTextFromFile } from './intake';
+import { DOMINO_PEEK, DOMINO_SCAN, DOMINO_DONE } from './domino';
 
 // ---------- state ----------
 
@@ -109,6 +110,23 @@ const TYPE_OPTIONS: Array<[PlaceholderType, string]> = [
 ];
 
 const GLYPH: Record<Flag['kind'], string> = { direct: '●', name: '◆', contextual: '▲' };
+
+// ---------- Domino ----------
+
+const dominoPeek = $('domino-peek');
+const dominoScan = $('domino-scan');
+dominoPeek.innerHTML = DOMINO_PEEK;
+dominoScan.innerHTML = DOMINO_SCAN;
+
+/** Peek over the empty paste box; duck away once a document is in play. */
+function updateDominoPeek(): void {
+  dominoPeek.hidden = !(docInput.value.trim().length === 0 && review.hidden);
+}
+
+/** Eyes covered while a scan runs: even the mascot doesn't look. */
+function setDominoScanning(scanning: boolean): void {
+  dominoScan.hidden = !scanning;
+}
 const KIND_LABEL: Record<Flag['kind'], string> = {
   direct: 'Direct identifier',
   name: 'Name',
@@ -234,6 +252,7 @@ async function intakeFile(file: File): Promise<void> {
   } catch (err) {
     scanStatus.textContent = err instanceof Error ? err.message : 'Could not read that file.';
   }
+  updateDominoPeek();
   syncCardHeight();
 }
 
@@ -278,6 +297,7 @@ EXAMPLES.forEach((example, i) => {
     docBaseName = example.base;
     scanStatus.textContent = 'Loaded a fictional sample document. Press Mask to see the review flow.';
     review.hidden = true;
+    updateDominoPeek();
     syncCardHeight();
   });
 });
@@ -334,6 +354,7 @@ function runScan(): void {
     return;
   }
   scanId++;
+  setDominoScanning(true);
   scanStatus.textContent = 'Scanning on your device…';
   nerWorker.postMessage({ type: 'scan', id: scanId, text: docText });
 }
@@ -343,11 +364,13 @@ $('btn-mask').addEventListener('click', () => {
   if (docText.trim().length === 0) {
     scanStatus.textContent = 'Paste a document to begin.';
     review.hidden = true;
+    updateDominoPeek();
     syncCardHeight();
     return;
   }
   if (!modelReady && !modelFailed) {
     queuedScan = true;
+    setDominoScanning(true);
     scanStatus.textContent = 'Waiting for the on-device name model, then scanning…';
     return;
   }
@@ -428,6 +451,8 @@ function finishScan(nameFlags: Flag[] | undefined): void {
       : `${n} flag${n === 1 ? '' : 's'} staged for your review. Click any highlight to act on it.${matchedNote}`;
 
   review.hidden = false;
+  setDominoScanning(false);
+  updateDominoPeek();
   renderAll();
 }
 
@@ -670,6 +695,13 @@ function renderSummary(): void {
   pendingSpan.className = 'count-pending';
   pendingSpan.textContent = pending === 0 ? 'all reviewed' : `${pending} pending`;
   summaryCounts.append(pendingSpan);
+  if (pending === 0 && uiFlags.length > 0) {
+    const done = document.createElement('span');
+    done.className = 'domino-done';
+    done.setAttribute('aria-hidden', 'true');
+    done.innerHTML = DOMINO_DONE;
+    summaryCounts.append(done);
+  }
 
   const approveAll = $<HTMLButtonElement>('btn-approve-all');
   approveAll.disabled = pending === 0;
@@ -999,6 +1031,8 @@ $('btn-clear').addEventListener('click', () => {
 setMode('mask');
 renderWatchlist();
 renderMappingStrip();
+docInput.addEventListener('input', updateDominoPeek);
+updateDominoPeek();
 window.addEventListener('resize', syncCardHeight);
 
 if ('serviceWorker' in navigator) {
