@@ -1,15 +1,16 @@
-# Deploys the built site to the static host over FTPS.
+# Deploys the built site to Dreamhost over rsync/SSH.
 #
 # Manual-trigger only until Chris confirms the first deploy looks right
 # (CLAUDE.md: "Chris decides at first deploy"). To make it automatic
 # afterward, uncomment the push trigger below.
 #
 # Required repository secrets (Settings -> Secrets and variables -> Actions):
-#   FTP_SERVER      e.g. ftp.example.com
-#   FTP_USERNAME    the host account username
-#   FTP_PASSWORD    the host account password
-#   FTP_SERVER_DIR  remote directory the site serves from, with trailing
-#                   slash, e.g. namemasker.com/
+#   DEPLOY_SSH_KEY  private half of the dedicated deploy keypair (set via gh)
+#   DEPLOY_HOST     Dreamhost SSH server, e.g. example.dreamhost.com
+#   DEPLOY_USER     the shell user on that server
+#   DEPLOY_PATH     directory the site serves from, with trailing slash,
+#                   e.g. ~/namemasker.com/
+# The matching public key must be in the shell user's ~/.ssh/authorized_keys.
 name: deploy
 
 on:
@@ -42,13 +43,16 @@ jobs:
       - name: Build site
         run: npm -w @namemasker/site run build
 
-      # Pinned to the v4.4.0 commit SHA per dependency policy.
-      - name: Upload dist over FTPS
-        uses: SamKirkland/FTP-Deploy-Action@110f9186c050f71550953127052e77650219c287
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftps
-          local-dir: apps/site/dist/
-          server-dir: ${{ secrets.FTP_SERVER_DIR }}
+      - name: Deploy over rsync/SSH
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          rsync -az --delete \
+            -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new" \
+            apps/site/dist/ "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH"
