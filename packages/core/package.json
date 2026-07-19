@@ -1,0 +1,22 @@
+{
+  "name": "@namemasker/core",
+  "version": "0.1.0",
+  "description": "Local PII detection, masking, and restore engine for NameMasker. Runs in browser and Node; no network, no telemetry.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "check": "tsc --noEmit",
+    "build": "tsc -p tsconfig.build.json"
+  },
+  "devDependencies": {
+    "typescript": "7.0.2",
+    "vitest": "4.1.10"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "namemasker-monorepo",
+  "private": true,
+  "license": "MIT",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "test": "npm -w @namemasker/core run test",
+    "check": "npm -w @namemasker/core run check"
+  }
+}
