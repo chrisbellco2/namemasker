@@ -457,6 +457,9 @@ function finishScan(nameFlags: Flag[] | undefined): void {
 }
 
 function approve(f: UIFlag): void {
+  // A decision applies to the text, not one occurrence: every flag with the
+  // same target moves together, matching the text-wide masking pass.
+  for (const o of uiFlags) if (o.target === f.target && o.status === 'pending') o.status = 'approved';
   f.status = 'approved';
   if (placeholderFor(f.target) === undefined) {
     addToMap(map, { text: f.target, placeholderType: f.type });
@@ -466,13 +469,26 @@ function approve(f: UIFlag): void {
 }
 
 function unapprove(f: UIFlag): void {
+  for (const o of uiFlags) {
+    if (o.target === f.target && o.status === 'approved' && !o.fromMap) o.status = 'pending';
+  }
   f.status = 'pending';
-  const usedElsewhere = uiFlags.some((o) => o !== f && o.status === 'approved' && o.target === f.target);
-  if (sessionAdded.has(f.target) && !usedElsewhere) {
+  if (sessionAdded.has(f.target)) {
     delete map.mapping[f.target];
     delete map.aliases[f.target];
     sessionAdded.delete(f.target);
     saveMap();
+  }
+}
+
+function dismissTarget(f: UIFlag): void {
+  for (const o of uiFlags) if (o.target === f.target && o.status !== 'dismissed') o.status = 'dismissed';
+}
+
+function restoreTarget(f: UIFlag): void {
+  for (const o of uiFlags) {
+    if (o.target !== f.target || o.status !== 'dismissed') continue;
+    o.status = o.fromMap ? 'approved' : 'pending';
   }
 }
 
@@ -618,52 +634,80 @@ function renderedMaskedText(): string {
   return applyMap(docText, map, dismissedTargets());
 }
 
-/**
- * Non-overlapping display spans. Approved flags rank by span length so the
- * preview matches the masking pass, which replaces longest-first
- * ("Lakeside Prep" -> School 1 beats "Lakeside" -> Place 1). Pending flags
- * rank direct > name > contextual so a direct hit is never visually
- * swallowed by a longer contextual passage.
- */
-function displaySpans(): UIFlag[] {
-  const kindRank = (f: UIFlag): number =>
-    f.flag.kind === 'direct' ? 0 : f.flag.kind === 'name' ? 1 : 2;
-  const len = (f: UIFlag): number => f.flag.end - f.flag.start;
-  const active = uiFlags.filter((f) => f.status !== 'dismissed' && f.flag.start >= 0);
-  const chosen: UIFlag[] = [];
-  const ordered = [...active].sort((a, b) => {
-    const ar = a.status === 'approved' ? 0 : 1;
-    const br = b.status === 'approved' ? 0 : 1;
-    if (ar !== br) return ar - br;
-    if (ar === 0) return len(b) - len(a) || kindRank(a) - kindRank(b);
-    return kindRank(a) - kindRank(b) || len(b) - len(a);
-  });
-  for (const f of ordered) {
-    if (!chosen.some((c) => f.flag.start < c.flag.end && c.flag.start < f.flag.end)) chosen.push(f);
-  }
-  return chosen.sort((a, b) => a.flag.start - b.flag.start);
+function escapeRegExp(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+interface DocSpan {
+  start: number;
+  end: number;
+  /** Set for map-derived chips: the real string this occurrence masks. */
+  real?: string;
+  /** Set for pending flag highlights. */
+  ui?: UIFlag;
+}
+
+/**
+ * The map is the truth the preview must match: every occurrence of every
+ * active real renders as its placeholder chip, exactly mirroring applyMap
+ * (longest real wins overlaps, whole-token matches, dismissed targets
+ * excluded). Pending flags highlight on top of whatever text remains,
+ * ranked direct > name > contextual so a direct hit is never visually
+ * swallowed by a longer contextual passage.
+ */
 function renderDocview(): void {
   docview.textContent = '';
+  const excluded = dismissedTargets();
+  const spans: DocSpan[] = [];
+  const overlapsAny = (s: number, e: number): boolean => spans.some((x) => s < x.end && x.start < e);
+
+  const reals = [...Object.keys(map.mapping), ...Object.keys(map.aliases)]
+    .filter((r) => !excluded.has(r))
+    .sort((a, b) => b.length - a.length);
+  for (const real of reals) {
+    const re = new RegExp(`(?<!\\w)${escapeRegExp(real)}(?!\\w)`, 'g');
+    let m: RegExpExecArray | null;
+    while ((m = re.exec(docText)) !== null) {
+      if (!overlapsAny(m.index, m.index + m[0].length)) {
+        spans.push({ start: m.index, end: m.index + m[0].length, real });
+      }
+      if (m.index === re.lastIndex) re.lastIndex++;
+    }
+  }
+
+  const kindRank = (f: UIFlag): number =>
+    f.flag.kind === 'direct' ? 0 : f.flag.kind === 'name' ? 1 : 2;
+  const pending = uiFlags
+    .filter((f) => f.status === 'pending' && f.flag.start >= 0)
+    .sort(
+      (a, b) =>
+        kindRank(a) - kindRank(b) || (b.flag.end - b.flag.start) - (a.flag.end - a.flag.start),
+    );
+  for (const f of pending) {
+    if (!overlapsAny(f.flag.start, f.flag.end)) spans.push({ start: f.flag.start, end: f.flag.end, ui: f });
+  }
+
+  spans.sort((a, b) => a.start - b.start);
   let pos = 0;
-  for (const f of displaySpans()) {
-    if (f.flag.start > pos) docview.append(docText.slice(pos, f.flag.start));
+  for (const s of spans) {
+    if (s.start > pos) docview.append(docText.slice(pos, s.start));
     const mark = document.createElement('mark');
-    mark.className = `hl kind-${f.flag.kind}`;
-    mark.dataset['flagId'] = String(f.id);
     mark.tabIndex = 0;
     mark.setAttribute('role', 'button');
-    if (f.status === 'approved') {
-      mark.classList.add('approved');
-      mark.textContent = placeholderFor(f.target) ?? f.target;
-      mark.setAttribute('aria-label', `${f.flag.text}, masked as ${placeholderFor(f.target) ?? ''}. Open options.`);
-    } else {
-      mark.textContent = docText.slice(f.flag.start, f.flag.end);
-      mark.setAttribute('aria-label', `${f.flag.text}: ${f.flag.reason}. Open options.`);
+    if (s.real !== undefined) {
+      const ph = placeholderFor(s.real) ?? s.real;
+      mark.className = 'hl kind-name approved';
+      mark.dataset['real'] = s.real;
+      mark.textContent = ph;
+      mark.setAttribute('aria-label', `${s.real}, masked as ${ph}. Open options.`);
+    } else if (s.ui !== undefined) {
+      mark.className = `hl kind-${s.ui.flag.kind}`;
+      mark.dataset['flagId'] = String(s.ui.id);
+      mark.textContent = docText.slice(s.start, s.end);
+      mark.setAttribute('aria-label', `${s.ui.flag.text}: ${s.ui.flag.reason}. Open options.`);
     }
     docview.append(mark);
-    pos = f.flag.end;
+    pos = s.end;
   }
   docview.append(docText.slice(pos));
 }
@@ -781,14 +825,14 @@ function appendActions(container: HTMLElement, f: UIFlag, editInput: HTMLInputEl
         renderAll();
       }),
       makeButton('Dismiss', () => {
-        f.status = 'dismissed';
+        dismissTarget(f);
         renderAll();
       }),
     );
   } else if (f.status === 'approved') {
     container.append(
       makeButton(f.fromMap ? 'Skip in this document' : 'Undo', () => {
-        if (f.fromMap) f.status = 'dismissed';
+        if (f.fromMap) dismissTarget(f);
         else unapprove(f);
         renderAll();
       }),
@@ -796,7 +840,7 @@ function appendActions(container: HTMLElement, f: UIFlag, editInput: HTMLInputEl
   } else {
     container.append(
       makeButton('Restore', () => {
-        f.status = f.fromMap ? 'approved' : 'pending';
+        restoreTarget(f);
         renderAll();
       }),
     );
@@ -854,10 +898,36 @@ function openPopover(f: UIFlag, anchor: DOMRect): void {
 }
 
 function flagFromEvent(e: Event): UIFlag | undefined {
-  const mark = (e.target as HTMLElement).closest('mark[data-flag-id]');
+  const mark = (e.target as HTMLElement).closest('mark[data-flag-id], mark[data-real]') as HTMLElement | null;
   if (mark === null) return undefined;
-  const id = (mark as HTMLElement).dataset['flagId'];
-  return uiFlags.find((f) => f.id === Number(id));
+  const id = mark.dataset['flagId'];
+  if (id !== undefined) return uiFlags.find((f) => f.id === Number(id));
+  const real = mark.dataset['real'];
+  if (real === undefined) return undefined;
+  let ui = uiFlags.find((f) => f.target === real);
+  if (ui === undefined) {
+    // A map entry with no scan-time flag (e.g. imported mid-session);
+    // synthesize one so the popover can act on it.
+    const at = docText.indexOf(real);
+    ui = {
+      id: nextId++,
+      flag: {
+        kind: 'name',
+        category: 'mapping',
+        start: Math.max(0, at),
+        end: Math.max(0, at) + real.length,
+        text: real,
+        reason: map.aliases[real] !== undefined ? 'In your loaded map (alias)' : 'In your loaded map',
+        placeholderType: 'other',
+      },
+      status: 'approved',
+      target: real,
+      type: 'other',
+      fromMap: true,
+    };
+    uiFlags.push(ui);
+  }
+  return ui;
 }
 
 docview.addEventListener('click', (e) => {
@@ -876,7 +946,7 @@ docview.addEventListener('keydown', (e) => {
 document.addEventListener('mousedown', (e) => {
   if (popover.hidden) return;
   const t = e.target as Node;
-  if (!popover.contains(t) && !(t instanceof HTMLElement && t.closest('mark[data-flag-id]'))) {
+  if (!popover.contains(t) && !(t instanceof HTMLElement && t.closest('mark[data-flag-id], mark[data-real]'))) {
     closePopover();
   }
 });
