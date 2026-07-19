@@ -306,7 +306,17 @@ faceMask.addEventListener('drop', (e) => {
   docInput.classList.remove('dropping');
 });
 
+/** True to proceed; warns when pending flags would leave text unmasked. */
+function confirmPendingLeak(action: string): boolean {
+  const pending = uiFlags.filter((f) => f.status === 'pending').length;
+  if (pending === 0) return true;
+  return confirm(
+    `${pending} flag${pending === 1 ? ' is' : 's are'} still pending review and will NOT be masked. ${action} anyway?`,
+  );
+}
+
 $('btn-download-masked').addEventListener('click', () => {
+  if (!confirmPendingLeak('Download')) return;
   const blob = new Blob([renderedMaskedText()], { type: 'text/plain' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
@@ -844,22 +854,48 @@ document.addEventListener('keydown', (e) => {
 
 // ---------- copy ----------
 
-function wireCopy(buttonId: string, getText: () => string): void {
+/** Fallback for when the async clipboard API rejects (e.g. focus quirks). */
+function legacyCopy(text: string): boolean {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.append(ta);
+  ta.select();
+  let ok = false;
+  try {
+    ok = document.execCommand('copy');
+  } catch {
+    ok = false;
+  }
+  ta.remove();
+  return ok;
+}
+
+function wireCopy(buttonId: string, getText: () => string, guard?: () => boolean): void {
   const btn = $<HTMLButtonElement>(buttonId);
   const original = btn.textContent;
+  const restore = (label: string, ms: number): void => {
+    btn.textContent = label;
+    setTimeout(() => {
+      btn.textContent = original;
+    }, ms);
+  };
   btn.addEventListener('click', async () => {
+    if (guard !== undefined && !guard()) return;
+    const text = getText();
     try {
-      await navigator.clipboard.writeText(getText());
-      btn.textContent = 'Copied';
-      setTimeout(() => {
-        btn.textContent = original;
-      }, 1400);
+      await navigator.clipboard.writeText(text);
+      restore('Copied', 1400);
     } catch {
-      btn.textContent = 'Copy failed — select and copy manually';
+      // Never fail silently: a stale clipboard here would paste the
+      // original, unmasked document — the worst possible quiet failure.
+      if (legacyCopy(text)) restore('Copied', 1400);
+      else restore('Copy FAILED — nothing was copied. Select the text and copy manually.', 5000);
     }
   });
 }
-wireCopy('btn-copy-masked', () => renderedMaskedText());
+wireCopy('btn-copy-masked', () => renderedMaskedText(), () => confirmPendingLeak('Copy'));
 wireCopy('btn-copy-unmasked', () => unmaskOutput.textContent ?? '');
 
 // ---------- unmask flow ----------
