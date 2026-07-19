@@ -82,7 +82,6 @@ const workbench = $('workbench');
 const rail = $('rail');
 const flagList = $<HTMLUListElement>('flag-list');
 const summaryCounts = $('summary-counts');
-const maskedOutput = $('masked-output');
 const pendingNote = $('pending-note');
 const unmaskInput = $<HTMLTextAreaElement>('unmask-input');
 const unmaskOutput = $('unmask-output');
@@ -450,7 +449,7 @@ function currentSelectionInPanes(): Selection | null {
   if (!sel || sel.isCollapsed || sel.rangeCount === 0) return null;
   const node = sel.anchorNode;
   if (node === null) return null;
-  if (!docview.contains(node) && !maskedOutput.contains(node)) return null;
+  if (!docview.contains(node)) return null;
   return sel;
 }
 
@@ -527,7 +526,6 @@ function renderAll(): void {
   renderDocview();
   renderRail();
   renderSummary();
-  renderOutput();
   renderMappingStrip();
   syncCardHeight();
 }
@@ -540,14 +538,27 @@ function renderedMaskedText(): string {
   return applyMap(docText, map, dismissedTargets());
 }
 
-/** Non-overlapping display spans: approved first, then direct > name > contextual. */
+/**
+ * Non-overlapping display spans. Approved flags rank by span length so the
+ * preview matches the masking pass, which replaces longest-first
+ * ("Lakeside Prep" -> School 1 beats "Lakeside" -> Place 1). Pending flags
+ * rank direct > name > contextual so a direct hit is never visually
+ * swallowed by a longer contextual passage.
+ */
 function displaySpans(): UIFlag[] {
-  const priority = (f: UIFlag): number =>
-    (f.status === 'approved' ? 0 : 4) +
-    (f.flag.kind === 'direct' ? 0 : f.flag.kind === 'name' ? 1 : 2);
+  const kindRank = (f: UIFlag): number =>
+    f.flag.kind === 'direct' ? 0 : f.flag.kind === 'name' ? 1 : 2;
+  const len = (f: UIFlag): number => f.flag.end - f.flag.start;
   const active = uiFlags.filter((f) => f.status !== 'dismissed' && f.flag.start >= 0);
   const chosen: UIFlag[] = [];
-  for (const f of [...active].sort((a, b) => priority(a) - priority(b))) {
+  const ordered = [...active].sort((a, b) => {
+    const ar = a.status === 'approved' ? 0 : 1;
+    const br = b.status === 'approved' ? 0 : 1;
+    if (ar !== br) return ar - br;
+    if (ar === 0) return len(b) - len(a) || kindRank(a) - kindRank(b);
+    return kindRank(a) - kindRank(b) || len(b) - len(a);
+  });
+  for (const f of ordered) {
     if (!chosen.some((c) => f.flag.start < c.flag.end && c.flag.start < f.flag.end)) chosen.push(f);
   }
   return chosen.sort((a, b) => a.flag.start - b.flag.start);
@@ -745,72 +756,35 @@ function openPopover(f: UIFlag, anchor: DOMRect): void {
 }
 
 function flagFromEvent(e: Event): UIFlag | undefined {
-  const mark = (e.target as HTMLElement).closest('mark[data-flag-id], button[data-real]');
+  const mark = (e.target as HTMLElement).closest('mark[data-flag-id]');
   if (mark === null) return undefined;
   const id = (mark as HTMLElement).dataset['flagId'];
-  if (id !== undefined) return uiFlags.find((f) => f.id === Number(id));
-  const real = (mark as HTMLElement).dataset['real'];
-  return uiFlags.find((f) => f.target === real);
+  return uiFlags.find((f) => f.id === Number(id));
 }
 
-for (const pane of [docview, maskedOutput]) {
-  pane.addEventListener('click', (e) => {
-    const f = flagFromEvent(e);
-    if (f === undefined) return;
-    openPopover(f, (e.target as HTMLElement).getBoundingClientRect());
-  });
-  pane.addEventListener('keydown', (e) => {
-    if ((e as KeyboardEvent).key !== 'Enter' && (e as KeyboardEvent).key !== ' ') return;
-    const f = flagFromEvent(e);
-    if (f === undefined) return;
-    e.preventDefault();
-    openPopover(f, (e.target as HTMLElement).getBoundingClientRect());
-  });
-}
+docview.addEventListener('click', (e) => {
+  const f = flagFromEvent(e);
+  if (f === undefined) return;
+  openPopover(f, (e.target as HTMLElement).getBoundingClientRect());
+});
+docview.addEventListener('keydown', (e) => {
+  if (e.key !== 'Enter' && e.key !== ' ') return;
+  const f = flagFromEvent(e);
+  if (f === undefined) return;
+  e.preventDefault();
+  openPopover(f, (e.target as HTMLElement).getBoundingClientRect());
+});
 
 document.addEventListener('mousedown', (e) => {
   if (popover.hidden) return;
   const t = e.target as Node;
-  if (!popover.contains(t) && !(t instanceof HTMLElement && t.closest('mark[data-flag-id], button[data-real]'))) {
+  if (!popover.contains(t) && !(t instanceof HTMLElement && t.closest('mark[data-flag-id]'))) {
     closePopover();
   }
 });
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') closePopover();
 });
-
-// ---------- masked output ----------
-
-function renderOutput(): void {
-  const masked = renderedMaskedText();
-  maskedOutput.textContent = '';
-  const placeholders = [...new Set([...Object.values(map.mapping)])].sort((a, b) => b.length - a.length);
-  if (placeholders.length === 0) {
-    maskedOutput.textContent = masked;
-    return;
-  }
-  const escaped = placeholders.map((p) => p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
-  const re = new RegExp(`(?<!\\w)(?:${escaped.join('|')})(?!\\w)`, 'g');
-  let pos = 0;
-  let m: RegExpExecArray | null;
-  const byPlaceholder = new Map<string, string>();
-  for (const [real, p] of Object.entries(map.mapping)) byPlaceholder.set(p, real);
-  while ((m = re.exec(masked)) !== null) {
-    if (m.index > pos) maskedOutput.append(masked.slice(pos, m.index));
-    const chip = document.createElement('button');
-    chip.type = 'button';
-    chip.className = 'ph-chip';
-    chip.textContent = m[0];
-    const real = byPlaceholder.get(m[0]);
-    if (real !== undefined) {
-      chip.dataset['real'] = real;
-      chip.title = `Masked: ${real}. Click for options.`;
-    }
-    maskedOutput.append(chip);
-    pos = m.index + m[0].length;
-  }
-  maskedOutput.append(masked.slice(pos));
-}
 
 // ---------- copy ----------
 
