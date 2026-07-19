@@ -75,6 +75,19 @@ added to the Dreamhost shell user's authorized_keys). No third-party deploy
 action at all — plain rsync in a run step. Host key is trusted on first
 use (StrictHostKeyChecking=accept-new).
 
+## 8b. Deploy user: shared account, isolation deferred (2026-07-18)
+
+First deploy attempted a dedicated `namemasker` shell user for blast-radius
+isolation, but the DreamHost panel offered no way to move the domain to
+that user, and the domain was already configured to serve
+/home/<shell-user>/sites/namemasker.com. Chris chose to deploy as
+<the main shell user>. Accepted trade-off, on the record: the CI deploy key can
+write to everything that account hosts (a dozen other
+domains), not just namemasker.com. Revisit if isolation ever matters
+(DreamHost support can move the domain between users on request). The
+unused `namemasker` user and its copy of the site can be deleted at
+cleanup.
+
 ## 9. Phase 3 NER model: dslim/distilbert-NER, int8, vendored (2026-07-18)
 
 Chris approved option 1 of three proposed (distilbert-NER ~65 MB int8 vs
