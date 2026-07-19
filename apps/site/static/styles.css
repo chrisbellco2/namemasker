@@ -158,6 +158,33 @@ body.mode-unmask .card { transform: rotateY(180deg); }
   margin-bottom: 0.35rem;
 }
 
+.field-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.linklike {
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--verdigris);
+  text-decoration: underline;
+  cursor: pointer;
+}
+.linklike:hover { color: var(--verdigris-deep); background: none; }
+
+textarea.dropping {
+  border-color: var(--verdigris);
+  outline: 2px dashed var(--verdigris);
+  outline-offset: -6px;
+}
+
 textarea {
   width: 100%;
   font: inherit;

@@ -15,9 +15,9 @@ name: deploy
 
 on:
   workflow_dispatch:
-  # push:
-  #   branches: [main]
-  #   paths: ['apps/site/**', 'packages/core/**']
+  push:
+    branches: [main]
+    paths: ['apps/site/**', 'packages/core/**', '.github/workflows/deploy.yml']
 
 concurrency:
   group: deploy

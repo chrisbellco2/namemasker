@@ -9,6 +9,7 @@ import {
   type Mapping,
   type PlaceholderType,
 } from '@namemasker/core';
+import { extractTextFromFile } from './intake';
 
 // ---------- state ----------
 
@@ -189,6 +190,53 @@ nerWorker.onerror = () => {
     'The name model could not load. Using the basic name pattern this session; it misses more than the model does.';
   if (queuedScan) runScan();
 };
+
+// ---------- file intake ----------
+
+/** Base filename of the last opened file, for naming the masked download. */
+let docBaseName = 'document';
+
+async function intakeFile(file: File): Promise<void> {
+  scanStatus.textContent = `Reading ${file.name} on your device…`;
+  try {
+    const extracted = await extractTextFromFile(file);
+    docInput.value = extracted.text;
+    docBaseName = extracted.baseName;
+    scanStatus.textContent = `Read ${file.name} (${extracted.text.length.toLocaleString()} characters). Nothing was uploaded. Press Mask when ready.`;
+  } catch (err) {
+    scanStatus.textContent = err instanceof Error ? err.message : 'Could not read that file.';
+  }
+  syncCardHeight();
+}
+
+$('btn-open-file').addEventListener('click', () => $<HTMLInputElement>('file-input').click());
+$<HTMLInputElement>('file-input').addEventListener('change', (e) => {
+  const file = (e.target as HTMLInputElement).files?.[0];
+  if (file) void intakeFile(file);
+  (e.target as HTMLInputElement).value = '';
+});
+docInput.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  docInput.classList.add('dropping');
+});
+docInput.addEventListener('dragleave', () => docInput.classList.remove('dropping'));
+docInput.addEventListener('drop', (e) => {
+  const file = e.dataTransfer?.files?.[0];
+  if (file) {
+    e.preventDefault();
+    void intakeFile(file);
+  }
+  docInput.classList.remove('dropping');
+});
+
+$('btn-download-masked').addEventListener('click', () => {
+  const blob = new Blob([maskedOutput.textContent ?? ''], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${docBaseName}.masked.txt`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
 
 // ---------- masking flow ----------
 

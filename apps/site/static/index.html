@@ -31,8 +31,12 @@
     <div class="scene">
       <div class="card" id="card">
         <div class="face face-mask" id="face-mask" role="tabpanel" aria-labelledby="tab-mask">
-          <label class="field-label" for="doc-input">Document</label>
-          <textarea id="doc-input" rows="10" placeholder="Paste a document to begin." spellcheck="false"></textarea>
+          <div class="field-head">
+            <label class="field-label" for="doc-input">Document</label>
+            <button type="button" class="linklike" id="btn-open-file">Open a PDF or Word file…</button>
+            <input type="file" id="file-input" accept=".pdf,.docx,.txt,.md" hidden>
+          </div>
+          <textarea id="doc-input" rows="10" placeholder="Paste a document to begin, or drop in a PDF or Word file." spellcheck="false"></textarea>
           <div class="actions">
             <button type="button" class="primary" id="btn-mask">Mask</button>
             <span class="status" id="scan-status" role="status" aria-live="polite"></span>
@@ -59,6 +63,7 @@
                 <h2>Masked text</h2>
                 <span class="status" id="pending-note"></span>
                 <button type="button" class="primary" id="btn-copy-masked">Copy masked text</button>
+                <button type="button" id="btn-download-masked">Download</button>
               </div>
               <pre id="masked-output"></pre>
             </div>
@@ -100,7 +105,7 @@
   <section class="prose">
     <h2>How to use it</h2>
     <ol>
-      <li>Paste your text above.</li>
+      <li>Paste your text above, or drop in a PDF or Word document. Files are read on your device and never uploaded.</li>
       <li>Press Mask. Identifying information lights up: names, schools, emails, phone numbers, and passages that might identify the student through context.</li>
       <li>Review the highlights. Approve them, edit them, dismiss false alarms, and flag anything the scan missed. You know the student; the tool does not.</li>
       <li>Copy the masked text and use it with any AI service you like.</li>

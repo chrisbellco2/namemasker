@@ -30,6 +30,12 @@ await build({
 
 cpSync(join(root, 'static'), dist, { recursive: true });
 
+// Vendor the pdf.js worker; nothing loads from a CDN.
+cpSync(
+  join(root, '../../node_modules/pdfjs-dist/build/pdf.worker.min.mjs'),
+  join(dist, 'pdf.worker.min.mjs'),
+);
+
 // Vendor the onnxruntime wasm runtime; nothing loads from a CDN.
 const ortSrc = join(root, '../../node_modules/onnxruntime-web/dist');
 mkdirSync(join(dist, 'ort'), { recursive: true });

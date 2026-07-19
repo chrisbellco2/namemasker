@@ -111,3 +111,13 @@ Known follow-up for a future mapping-format decision: a bare first name
 to the already-mapped "Maya Chen" (Student A). Alias support means allowing
 duplicate placeholder values with longest-real-wins on unmask — a format
 semantics change that needs Chris's sign-off first.
+
+## 10. Phase 4 file intake: pdfjs-dist + mammoth, text-out download (2026-07-19)
+
+Phase 3 closed by Chris; auto-deploy on push to main enabled at the same
+time. Intake: pdfjs-dist 6.1.200 (pdf.worker vendored, no CDN) and mammoth
+1.12.0, both exact-pinned, extraction fully client-side. Scanned/image
+PDFs get an honest "this tool does not read images" error instead of empty
+output. "Cleaned-file download" ships as {original-name}.masked.txt — a
+text file, not a rebuilt PDF/DOCX; regenerating formatted documents
+client-side is out of scope until demand proves it.
