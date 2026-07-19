@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NameMasker — mask student documents before AI, unmask after</title>
+  <meta name="description" content="A free, fully local tool that stages PII redactions in student documents so you can use AI services safely. Nothing leaves your browser.">
+  <meta name="theme-color" content="#1F6F60">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="preload" href="fonts/BricolageGrotesque-var.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/PublicSans-var.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="topbar">
+  <p class="wordmark" aria-label="NameMasker">
+    <span class="wm-chip"><span class="wm-real">Name</span><span class="wm-ph" aria-hidden="true">Student A</span></span>Masker
+  </p>
+  <p class="tagline">Stages redactions for your review. Nothing leaves your browser.</p>
+</header>
+
+<main>
+  <section class="stage" aria-label="Workspace">
+    <div class="mode-switch" role="tablist" aria-label="Mode">
+      <button type="button" role="tab" id="tab-mask" aria-selected="true" aria-controls="face-mask">Mask</button>
+      <button type="button" role="tab" id="tab-unmask" aria-selected="false" aria-controls="face-unmask">Unmask</button>
+    </div>
+
+    <div class="scene">
+      <div class="card" id="card">
+        <div class="face face-mask" id="face-mask" role="tabpanel" aria-labelledby="tab-mask">
+          <label class="field-label" for="doc-input">Document</label>
+          <textarea id="doc-input" rows="10" placeholder="Paste a document to begin." spellcheck="false"></textarea>
+          <div class="actions">
+            <button type="button" class="primary" id="btn-mask">Mask</button>
+            <span class="status" id="scan-status" role="status" aria-live="polite"></span>
+          </div>
+
+          <div id="review" hidden>
+            <div class="banner" id="accum-banner" hidden></div>
+            <div class="workbench">
+              <div class="docview" id="docview" tabindex="0" aria-label="Scanned document with staged flags"></div>
+              <aside class="rail" aria-label="Staged flags">
+                <div class="rail-head">
+                  <span id="flag-count" aria-live="polite"></span>
+                  <div class="rail-actions">
+                    <button type="button" id="btn-approve-all">Approve all</button>
+                    <button type="button" id="btn-flag-selection" title="Select text in the document, then add it as a flag">Flag selection</button>
+                  </div>
+                </div>
+                <ul class="flag-list" id="flag-list"></ul>
+              </aside>
+            </div>
+            <div class="output">
+              <div class="output-head">
+                <h2>Masked text</h2>
+                <span class="status" id="pending-note"></span>
+                <button type="button" class="primary" id="btn-copy-masked">Copy masked text</button>
+              </div>
+              <pre id="masked-output"></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="face face-unmask" id="face-unmask" role="tabpanel" aria-labelledby="tab-unmask" hidden>
+          <label class="field-label" for="unmask-input">AI output</label>
+          <textarea id="unmask-input" rows="10" placeholder="Paste AI output that contains placeholders." spellcheck="false"></textarea>
+          <div class="actions">
+            <button type="button" class="primary" id="btn-unmask">Unmask</button>
+            <span class="status" id="unmask-status" role="status" aria-live="polite"></span>
+          </div>
+          <div class="output" id="unmask-result" hidden>
+            <div class="output-head">
+              <h2>Restored text</h2>
+              <button type="button" class="primary" id="btn-copy-unmasked">Copy restored text</button>
+            </div>
+            <pre id="unmask-output"></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mapping-strip" aria-label="Mapping">
+      <div class="mapping-row">
+        <span id="mapping-count">No mapping yet.</span>
+        <div class="mapping-actions">
+          <button type="button" id="btn-export">Export mapping</button>
+          <button type="button" id="btn-import">Import mapping</button>
+          <input type="file" id="import-file" accept=".json,application/json" hidden>
+          <button type="button" id="btn-clear">Clear mapping</button>
+        </div>
+      </div>
+      <p class="mapping-note">The mapping file is the only sensitive artifact NameMasker creates. It is what makes Unmask work. Keep it with your student files; it is never transmitted.</p>
+    </div>
+  </section>
+
+  <section class="prose">
+    <h2>How to use it</h2>
+    <ol>
+      <li>Paste your text above.</li>
+      <li>Press Mask. Identifying information lights up: names, schools, emails, phone numbers, and passages that might identify the student through context.</li>
+      <li>Review the highlights. Approve them, edit them, dismiss false alarms, and flag anything the scan missed. You know the student; the tool does not.</li>
+      <li>Copy the masked text and use it with any AI service you like.</li>
+      <li>When you get results back, paste them under Unmask. Real names return everywhere the AI kept the placeholders.</li>
+      <li>Working with the same student across a season? Export the mapping and import it next session — the same student is always “Student A,” across every document.</li>
+    </ol>
+    <h3>Three kinds of flags</h3>
+    <ul class="legend">
+      <li><span class="legend-mark kind-direct">j.rivera@example.org</span> Direct identifiers — emails, phones, ID numbers, dates. Deterministic patterns, near-perfect reliability.</li>
+      <li><span class="legend-mark kind-name">Maya Chen</span> Names — people, schools, organizations. Pattern-detected today; an on-device model replaces this soon.</li>
+      <li><span class="legend-mark kind-contextual">first wrestling captain</span> Contextual flags — passages with no names that may still identify the student. Flagged for your judgment, never masked automatically.</li>
+    </ul>
+  </section>
+
+  <section class="prose">
+    <h2>How you can trust it</h2>
+    <ol>
+      <li><strong>Turn off your internet.</strong> Load the page, disconnect, and use the tool. It works fully offline because nothing it does requires a server.</li>
+      <li><strong>Watch the network.</strong> Open your browser’s developer tools and observe that no request carries your text anywhere.</li>
+      <li><strong>Read the code.</strong> The entire tool is open source under the MIT license.</li>
+      <li><strong>Trust the incentives.</strong> This tool is free, has no accounts, and collects nothing. Its only value is its credibility.</li>
+    </ol>
+    <p>One promise we will not make: NameMasker does not “guarantee anonymity.” No tool honestly can. It catches what software can catch, flags what software can only suspect, and puts you in the approval seat for everything. The review step is the product.</p>
+  </section>
+</main>
+
+<footer class="footer">
+  <p>NameMasker is free and open source (MIT). No accounts, no analytics, no server. Built by an independent educational consultant for colleagues who take student privacy seriously.</p>
+</footer>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>

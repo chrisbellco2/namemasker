@@ -1,0 +1,17 @@
+{
+  "name": "@namemasker/site",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "build": "node build.mjs",
+    "check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@namemasker/core": "0.1.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.1"
+  }
+}

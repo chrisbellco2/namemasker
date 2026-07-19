@@ -32,3 +32,27 @@ capitalized tokens continuing the same comma/and list are staged as probable
 schools (category `school-list-continuation`, weight 2). The chain breaks at
 the first lowercase word or end of list, which keeps the rule from wandering
 into unrelated text.
+
+## 5. Phase 2 design: "Greenroom" plan approved (2026-07-18)
+
+Approved by Chris. Palette: Graphite #22272B, Cool paper #F4F6F5, Verdigris
+#1F6F60, Signal red #B3402E (direct), Iris #4F5BC4 (name), Amber #B57A19
+(contextual). Kind is never carried by hue alone: distinct underline styles
+(solid/dashed/dotted) plus rail glyphs. Type: Bricolage Grotesque display +
+Public Sans body, vendored woff2, no CDN. Signature element: "the flip" —
+one workspace card with a light Mask face and a dark Unmask face, 3D-turned
+on mode switch (crossfade under reduced motion), wordmark chip flips
+Name ⇄ Student A.
+
+## 6. Site toolchain: esbuild only (2026-07-18)
+
+The site builds with a single dev dependency (esbuild) driven by a small
+build script; HTML, CSS, service worker, and manifest are hand-written. No
+framework, no bundler config surface. The service worker cache version is a
+content hash of dist, keeping builds deterministic for Phase 6.
+
+## 7. GitHub repo private until Phase 2 ships reviewed (2026-07-18)
+
+Chris's call. github.com/chrisbellco2/namemasker starts private; flip to
+public when the site is reviewed and live, consistent with the open-source
+trust posture without exposing half-built work.
