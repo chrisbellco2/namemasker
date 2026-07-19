@@ -1,4 +1,4 @@
-import type { ApprovedItem, Mapping, PlaceholderType } from './types';
+import type { ApprovedItem, Mapping, PlaceholderType, StudentMap } from './types';
 
 /**
  * Mapping and restore. The mapping is a flat JSON object, real string ->
@@ -90,7 +90,124 @@ export function unmaskText(text: string, mapping: Mapping): string {
   return text.replace(pattern, (m) => byPlaceholder.get(m) ?? m);
 }
 
-/** Serialize for export as {student}.map.json. */
+// ---------- map format v2 ----------
+
+export const MAP_FORMAT = 'namemasker-map@2';
+
+export function createStudentMap(): StudentMap {
+  return { mapping: {}, aliases: {}, watchlist: [] };
+}
+
+/** Lift a v1 flat mapping into the v2 shape. v1 files import forever. */
+export function liftV1(mapping: Mapping): StudentMap {
+  return { mapping: { ...mapping }, aliases: {}, watchlist: [] };
+}
+
+/**
+ * Add an approved item to the map. If the item is a person whose text is a
+ * word of an already-mapped person (bare "Maya" after "Maya Chen"), it
+ * becomes an alias of that placeholder instead of getting its own.
+ * Mutates the map; returns the placeholder used.
+ */
+export function addToMap(map: StudentMap, item: ApprovedItem): string {
+  const existing = map.mapping[item.text] ?? map.aliases[item.text];
+  if (existing !== undefined) return existing;
+  if (item.placeholderType === 'student') {
+    for (const [real, placeholder] of Object.entries(map.mapping)) {
+      if (placeholder.startsWith('Student ') && real.split(/\s+/).includes(item.text)) {
+        map.aliases[item.text] = placeholder;
+        return placeholder;
+      }
+    }
+  }
+  const placeholder = nextPlaceholder(item.placeholderType, map.mapping);
+  map.mapping[item.text] = placeholder;
+  return placeholder;
+}
+
+/**
+ * Apply the map to a document: canonical reals and aliases both mask to
+ * their placeholder. `exclude` skips specific reals for this document only
+ * (a dismissed watchlist hit) without touching the map.
+ */
+export function applyMap(text: string, map: StudentMap, exclude?: ReadonlySet<string>): string {
+  const pairs: Mapping = {};
+  for (const [real, ph] of Object.entries(map.mapping)) {
+    if (!exclude?.has(real)) pairs[real] = ph;
+  }
+  for (const [real, ph] of Object.entries(map.aliases)) {
+    if (!exclude?.has(real)) pairs[real] = ph;
+  }
+  const keys = Object.keys(pairs);
+  if (keys.length === 0) return text;
+  return text.replace(buildPattern(keys), (m) => pairs[m] ?? m);
+}
+
+/** Serialize the full v2 map for export as {student}.map.json. */
+export function serializeStudentMap(map: StudentMap): string {
+  return `${JSON.stringify(
+    { format: MAP_FORMAT, mapping: map.mapping, aliases: map.aliases, watchlist: map.watchlist },
+    null,
+    2,
+  )}\n`;
+}
+
+function validateEntries(obj: Record<string, unknown>, what: string): asserts obj is Mapping {
+  for (const [real, ph] of Object.entries(obj)) {
+    if (typeof ph !== 'string' || ph.length === 0 || real.length === 0) {
+      throw new Error(`Map file ${what} must map non-empty strings to non-empty strings.`);
+    }
+  }
+}
+
+/** Parse an imported map file: v2, or a v1 flat mapping (lifted). */
+export function parseStudentMap(json: string): StudentMap {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(json);
+  } catch {
+    throw new Error('Map file is not valid JSON.');
+  }
+  if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    throw new Error('Map file must be a JSON object.');
+  }
+  const obj = parsed as Record<string, unknown>;
+
+  if (obj['format'] === undefined) {
+    // v1: flat real -> placeholder
+    return liftV1(parseMapping(json));
+  }
+  if (obj['format'] !== MAP_FORMAT) {
+    throw new Error(`Unrecognized map format "${String(obj['format'])}".`);
+  }
+  const mapping = (obj['mapping'] ?? {}) as Record<string, unknown>;
+  const aliases = (obj['aliases'] ?? {}) as Record<string, unknown>;
+  const watchlist = obj['watchlist'] ?? [];
+  if (typeof mapping !== 'object' || mapping === null || Array.isArray(mapping)) {
+    throw new Error('Map file "mapping" must be an object.');
+  }
+  if (typeof aliases !== 'object' || aliases === null || Array.isArray(aliases)) {
+    throw new Error('Map file "aliases" must be an object.');
+  }
+  if (!Array.isArray(watchlist) || watchlist.some((w) => typeof w !== 'string' || w.length === 0)) {
+    throw new Error('Map file "watchlist" must be an array of non-empty strings.');
+  }
+  validateEntries(mapping, '"mapping"');
+  validateEntries(aliases, '"aliases"');
+  const seen = new Set<string>();
+  for (const ph of Object.values(mapping)) {
+    if (seen.has(ph)) throw new Error(`Map file reuses the placeholder "${ph}"; Unmask would be ambiguous.`);
+    seen.add(ph);
+  }
+  for (const [real, ph] of Object.entries(aliases)) {
+    if (!seen.has(ph)) {
+      throw new Error(`Alias "${real}" points at "${ph}", which is not in the mapping.`);
+    }
+  }
+  return { mapping, aliases, watchlist: [...new Set(watchlist as string[])] };
+}
+
+/** Serialize for export as {student}.map.json. (v1 shape; superseded by serializeStudentMap.) */
 export function serializeMapping(mapping: Mapping): string {
   return `${JSON.stringify(mapping, null, 2)}\n`;
 }

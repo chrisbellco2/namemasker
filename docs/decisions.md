@@ -112,6 +112,26 @@ to the already-mapped "Maya Chen" (Student A). Alias support means allowing
 duplicate placeholder values with longest-real-wins on unmask — a format
 semantics change that needs Chris's sign-off first.
 
+## 9b. Map format v2, aliases, watchlist, knownTerms, inline review (2026-07-19)
+
+Chris approved after discussion. The map file is now versioned
+(namemasker-map@2) with three sections: mapping (canonical real ->
+placeholder, unique, the only thing Unmask reads — restoration stays
+deterministic), aliases (alternate spellings masking to an existing
+placeholder; created automatically when a bare word of an already-mapped
+person is approved), and watchlist (always-flag terms; staged pre-approved
+on every scan, dismissible per document, deletable without breaking
+anything). v1 flat files import forever; localStorage migrates silently.
+Core gained ScanOptions.knownTerms — the shared primitive the site feeds
+from the watchlist and the private platform will feed from student
+records; that integration code stays out of this repo per the charter.
+Review UX: the document is the primary surface — click any highlight (in
+either pane) for a popover with reason and actions; select text anywhere
+for a "Mask this" chip; the rail collapsed into a summary bar with a
+Details toggle. Semantics worth remembering: deleting from watchlist or
+aliases is always safe; deleting a mapping entry is the only destructive
+act.
+
 ## 10. Phase 4 file intake: pdfjs-dist + mammoth, text-out download (2026-07-19)
 
 Phase 3 closed by Chris; auto-deploy on push to main enabled at the same

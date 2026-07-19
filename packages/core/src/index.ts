@@ -18,6 +18,8 @@ export type {
   AccumulationResult,
   ScanResult,
   Mapping,
+  StudentMap,
+  KnownTerm,
   ApprovedItem,
 } from './types';
 export { DEFAULT_OPTIONS } from './types';
@@ -28,11 +30,20 @@ export { detectContextual, collectSignals } from './contextual';
 export type { ContextualResult } from './contextual';
 export { scanDocument } from './scan';
 
+export { detectKnownTerms } from './scan';
+
 export {
   nextPlaceholder,
   maskText,
   unmaskText,
   serializeMapping,
   parseMapping,
+  MAP_FORMAT,
+  createStudentMap,
+  liftV1,
+  addToMap,
+  applyMap,
+  serializeStudentMap,
+  parseStudentMap,
 } from './mapping';
 export type { MaskResult } from './mapping';

@@ -303,6 +303,158 @@ button.primary:hover { background: var(--verdigris-deep); }
   color: var(--verdigris-deep);
 }
 
+/* ---- Summary bar ---- */
+
+.summary-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  border: 1px solid var(--line);
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.8rem;
+  font-size: 0.93rem;
+  background: var(--card);
+}
+#summary-counts { display: inline-flex; gap: 0.7rem; align-items: baseline; font-weight: 600; }
+#summary-counts .kind-direct { color: var(--signal); }
+#summary-counts .kind-name { color: var(--iris); }
+#summary-counts .kind-contextual { color: var(--amber); }
+.count-pending { color: var(--ink-soft); font-weight: 400; }
+.summary-hint { color: var(--ink-soft); flex: 1 1 14rem; font-size: 0.85rem; }
+.summary-actions { display: flex; gap: 0.4rem; }
+.summary-actions button { font-size: 0.85rem; padding: 0.25rem 0.6rem; }
+
+.workbench[data-rail='off'] { grid-template-columns: minmax(0, 1fr); }
+
+/* Clickable highlights: cursor + focus affordance */
+.hl { cursor: pointer; }
+.hl:hover { filter: brightness(0.96); }
+
+/* ---- Popover ---- */
+
+.popover {
+  position: absolute;
+  z-index: 30;
+  max-width: 22rem;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 0.6rem;
+  box-shadow: 0 6px 24px rgba(34, 39, 43, 0.18);
+  padding: 0.7rem 0.8rem;
+  font-size: 0.92rem;
+}
+.pop-kind { font-weight: 700; font-size: 0.82rem; margin-bottom: 0.2rem; }
+.pop-kind.kind-direct { color: var(--signal); }
+.pop-kind.kind-name { color: var(--iris); }
+.pop-kind.kind-contextual { color: var(--amber); }
+.pop-term { font-weight: 600; overflow-wrap: anywhere; }
+.pop-reason { color: var(--ink-soft); margin-top: 0.25rem; }
+.pop-edit {
+  font: inherit;
+  font-size: 0.88rem;
+  width: 100%;
+  margin-top: 0.5rem;
+  border: 1px solid var(--line);
+  border-radius: 0.4rem;
+  padding: 0.25rem 0.45rem;
+}
+.pop-actions {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.55rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.pop-actions button { font-size: 0.85rem; padding: 0.25rem 0.6rem; }
+.pop-actions select {
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 0.2rem 0.3rem;
+  border-radius: 0.4rem;
+  border: 1px solid var(--line);
+  background: var(--card);
+}
+
+@media (max-width: 640px) {
+  .popover {
+    position: fixed;
+    top: auto !important;
+    left: 0 !important;
+    right: 0;
+    bottom: 0;
+    max-width: none;
+    border-radius: 0.8rem 0.8rem 0 0;
+    box-shadow: 0 -6px 24px rgba(34, 39, 43, 0.25);
+  }
+}
+
+/* ---- "Mask this" selection chip ---- */
+
+.sel-chip {
+  position: absolute;
+  z-index: 31;
+  font-size: 0.85rem;
+  padding: 0.25rem 0.7rem;
+  background: var(--graphite);
+  color: var(--paper);
+  border: 0;
+  border-radius: 999px;
+  box-shadow: 0 3px 10px rgba(34, 39, 43, 0.3);
+}
+.sel-chip:hover { background: var(--verdigris-deep); color: #fff; }
+
+/* Output placeholder chips are buttons; keep the chip look */
+button.ph-chip { cursor: pointer; }
+button.ph-chip:hover { background: color-mix(in srgb, var(--approved-tint) 70%, var(--verdigris) 12%); }
+
+/* ---- Watchlist ---- */
+
+.watchlist-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  padding-bottom: 0.6rem;
+  margin-bottom: 0.6rem;
+  border-bottom: 1px dashed var(--line);
+}
+.watchlist-label { font-weight: 600; font-size: 0.95rem; }
+.watch-chips { display: inline-flex; gap: 0.35rem; flex-wrap: wrap; }
+.watch-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.1rem 0.3rem 0.1rem 0.6rem;
+  font-size: 0.88rem;
+  background: var(--card);
+}
+.chip-x {
+  border: 0;
+  background: none;
+  padding: 0 0.25rem;
+  font-size: 1rem;
+  line-height: 1;
+  color: var(--ink-soft);
+  cursor: pointer;
+  border-radius: 999px;
+}
+.chip-x:hover { color: var(--signal); background: none; }
+.watchlist-add { display: inline-flex; gap: 0.35rem; margin-left: auto; }
+.watchlist-add input {
+  font: inherit;
+  font-size: 0.88rem;
+  border: 1px solid var(--line);
+  border-radius: 0.4rem;
+  padding: 0.25rem 0.5rem;
+  width: 17rem;
+  max-width: 60vw;
+}
+.watchlist-add button { font-size: 0.85rem; padding: 0.25rem 0.6rem; }
+
 /* ---- Flag rail ---- */
 
 .rail {

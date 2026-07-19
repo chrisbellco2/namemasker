@@ -19,7 +19,7 @@ One promise we will not make: NameMasker does not "guarantee anonymity." No tool
 1. Open namemasker.com. It works in any modern browser. After your first visit it works offline.
 2. Paste your text, or drop in a PDF or Word document.
 3. Press Mask. Identifying information lights up in the text: names, schools, emails, phone numbers, and passages that might identify the student through context.
-4. Review the highlights. Approve them, edit them, dismiss false alarms, and add anything the scan missed. You know the student; the tool does not.
+4. Review the highlights — click any one to approve, edit, or dismiss it. Caught something the scan missed? Select the text and press "Mask this," or keep an always-flag list of names the scan should never miss. You know the student; the tool does not.
 5. Copy the masked text and use it with any AI service you like.
 6. When you get results back, paste them in and press Unmask. Real names return everywhere the AI kept the placeholders.
 
@@ -46,7 +46,7 @@ NameMasker is a static web page. When you visit, your browser downloads the appl
 - Pattern detection. Emails, phone numbers, ID numbers, and dates are found with deterministic rules. No AI involved, near-perfect accuracy.
 - Name detection. A compact named-entity-recognition model runs inside your browser tab and tags people, organizations, and places. This is machine learning, but it is your machine doing the work. Nothing is sent anywhere.
 - Contextual heuristics. A rule set scores combinations of signals: uniqueness claims, rare activities, narrow institutions, geographic detail. When signals stack within a passage, it gets a yellow flag with a stated reason. The rules are tuned to over-flag mildly, because a false alarm costs you a glance and a false miss costs a student their privacy.
-- The mapping. Masked replacements are recorded in a small file on your device: real name on one side, placeholder on the other. This file is what makes Unmask work, and it is the only sensitive artifact the tool creates. It lives wherever your student files already live. It is never transmitted.
+- The map. Masked replacements are recorded in a small file on your device: real name on one side, placeholder on the other, plus aliases (so "Maya" and "Maya Chen" share one placeholder, and Unmask always restores the full name) and your always-flag list. This file is what makes Unmask work, and it is the only sensitive artifact the tool creates. It lives wherever your student files already live. It is never transmitted.
 - Unmasking. Pure text substitution using the mapping, in reverse.
 
 There is no backend. The site is static files on a web server, and the server never receives your text, your files, or your mapping. You can verify this yourself: open your browser's network inspector, or simply turn off your internet connection after the page loads and watch everything keep working.

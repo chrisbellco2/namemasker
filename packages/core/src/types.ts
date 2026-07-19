@@ -52,6 +52,12 @@ export interface ScanOptions {
    * When provided, these replace the built-in naive capitalized-pair layer.
    */
   nameFlags?: Flag[];
+  /**
+   * Terms the caller already knows are identifying (the user's watchlist, or
+   * a student record on the caller's side). Staged with top priority; they
+   * win every overlap with detected flags.
+   */
+  knownTerms?: KnownTerm[];
 }
 
 export interface AccumulationResult {
@@ -69,13 +75,36 @@ export interface ScanResult {
 /** Flat mapping: real string -> placeholder. The only sensitive artifact. */
 export type Mapping = Record<string, string>;
 
+/**
+ * Map format v2 (namemasker-map@2): the full sensitive artifact.
+ * - mapping: canonical real -> placeholder, placeholders unique. Unmask
+ *   restores ONLY these, so restoration is always deterministic.
+ * - aliases: alternate spellings -> an existing placeholder. They mask but
+ *   never win at unmask ("Maya" -> "Student A" alongside "Maya Chen").
+ * - watchlist: terms to always stage on scan. Deleting one only affects
+ *   future scans; deleting a mapping entry is the only destructive act.
+ */
+export interface StudentMap {
+  mapping: Mapping;
+  aliases: Mapping;
+  watchlist: string[];
+}
+
+/** A term the caller already knows is identifying (watchlist, student record). */
+export interface KnownTerm {
+  term: string;
+  placeholderType?: PlaceholderType;
+  /** Optional reason override shown on the flag. */
+  label?: string;
+}
+
 /** A flag the professional approved, possibly with an edited replacement type. */
 export interface ApprovedItem {
   text: string;
   placeholderType: PlaceholderType;
 }
 
-export const DEFAULT_OPTIONS: Required<Omit<ScanOptions, 'nameFlags'>> = {
+export const DEFAULT_OPTIONS: Required<Omit<ScanOptions, 'nameFlags' | 'knownTerms'>> = {
   flagThreshold: 3,
   accumulationThreshold: 6,
   proximityWindow: 200,

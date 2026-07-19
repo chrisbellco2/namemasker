@@ -45,16 +45,17 @@
 
           <div id="review" hidden>
             <div class="banner" id="accum-banner" hidden></div>
-            <div class="workbench">
+            <div class="summary-bar">
+              <span id="summary-counts" aria-live="polite"></span>
+              <span class="summary-hint">Click a highlight to approve, edit, or dismiss it. Select any text and press “Mask this.”</span>
+              <div class="summary-actions">
+                <button type="button" id="btn-approve-all">Approve all</button>
+                <button type="button" id="btn-toggle-rail">Details</button>
+              </div>
+            </div>
+            <div class="workbench" id="workbench" data-rail="off">
               <div class="docview" id="docview" tabindex="0" aria-label="Scanned document with staged flags"></div>
-              <aside class="rail" aria-label="Staged flags">
-                <div class="rail-head">
-                  <span id="flag-count" aria-live="polite"></span>
-                  <div class="rail-actions">
-                    <button type="button" id="btn-approve-all">Approve all</button>
-                    <button type="button" id="btn-flag-selection" title="Select text in the document, then add it as a flag">Flag selection</button>
-                  </div>
-                </div>
+              <aside class="rail" id="rail" aria-label="Staged flags" hidden>
                 <ul class="flag-list" id="flag-list"></ul>
               </aside>
             </div>
@@ -88,9 +89,17 @@
       </div>
     </div>
 
-    <div class="mapping-strip" aria-label="Mapping">
+    <div class="mapping-strip" aria-label="Map">
+      <div class="watchlist-row">
+        <label class="watchlist-label" for="watchlist-input">Always flag</label>
+        <span class="watch-chips" id="watchlist-chips"></span>
+        <span class="watchlist-add">
+          <input type="text" id="watchlist-input" placeholder="Add a name the scan should never miss">
+          <button type="button" id="btn-watch-add">Add</button>
+        </span>
+      </div>
       <div class="mapping-row">
-        <span id="mapping-count">No mapping yet.</span>
+        <span id="mapping-count">No map yet.</span>
         <div class="mapping-actions">
           <button type="button" id="btn-export">Export mapping</button>
           <button type="button" id="btn-import">Import mapping</button>
@@ -98,7 +107,7 @@
           <button type="button" id="btn-clear">Clear mapping</button>
         </div>
       </div>
-      <p class="mapping-note">The mapping file is the only sensitive artifact NameMasker creates. It is what makes Unmask work. Keep it with your student files; it is never transmitted.</p>
+      <p class="mapping-note">The map file — placeholders, aliases, and your always-flag list — is the only sensitive artifact NameMasker creates. It is what makes Unmask work. Keep it with your student files; it is never transmitted.</p>
     </div>
   </section>
 
@@ -107,7 +116,7 @@
     <ol>
       <li>Paste your text above, or drop in a PDF or Word document. Files are read on your device and never uploaded.</li>
       <li>Press Mask. Identifying information lights up: names, schools, emails, phone numbers, and passages that might identify the student through context.</li>
-      <li>Review the highlights. Approve them, edit them, dismiss false alarms, and flag anything the scan missed. You know the student; the tool does not.</li>
+      <li>Review the highlights — click any one to approve, edit, or dismiss it. Caught something the scan missed? Select the text and press “Mask this,” or keep an always-flag list of names the scan should never miss. You know the student; the tool does not.</li>
       <li>Copy the masked text and use it with any AI service you like.</li>
       <li>When you get results back, paste them under Unmask. Real names return everywhere the AI kept the placeholders.</li>
       <li>Working with the same student across a season? Export the mapping and import it next session — the same student is always “Student A,” across every document.</li>
@@ -135,6 +144,9 @@
 <footer class="footer">
   <p>NameMasker is free and open source (MIT). No accounts, no analytics, no server. Built by an independent educational consultant for colleagues who take student privacy seriously.</p>
 </footer>
+
+<div class="popover" id="flag-popover" role="dialog" aria-label="Flag options" hidden></div>
+<button type="button" class="sel-chip" id="sel-chip" hidden>Mask this</button>
 
 <script type="module" src="app.js"></script>
 </body>
