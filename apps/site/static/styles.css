@@ -44,6 +44,13 @@ body {
   line-height: 1.55;
 }
 
+a {
+  color: var(--verdigris);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 0.15em;
+}
+a:hover { color: var(--verdigris-deep); }
+
 :focus-visible {
   outline: 2px solid var(--verdigris);
   outline-offset: 2px;

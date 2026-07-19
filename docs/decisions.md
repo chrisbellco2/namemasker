@@ -156,3 +156,15 @@ look, Chris's idea — and a small pop beside "all reviewed". Section
 headings carry his tail as a ringed underline stroke. All entrances are
 static under prefers-reduced-motion. Hand-drawn inline SVG in
 apps/site/src/domino.ts, palette-fixed, zero dependencies.
+
+## 12. Tagline, trust copy, repo public (2026-07-19)
+
+Chris approved the tagline "Mask before AI. Unmask after. Nothing leaves
+your browser." — the product's two verbs doing the explaining. The trust
+section gained a plain-language preamble (a website that sends nothing;
+masking is find-and-replace; the one AI part runs on-device like a
+spell-checker) and now links to this repository, which goes public. Before
+the flip, history was rewritten with git-filter-repo to scrub a real
+student number that had landed in a corpus test and commit message, and to
+redact the shell username, home path, and unrelated-domain details from
+the deploy ADRs. A pre-scrub backup clone was kept locally.

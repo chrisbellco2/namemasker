@@ -2,6 +2,9 @@
 
 Site copy source of truth. Lives at docs/product-text.md in the repo.
 
+Tagline (site header): "Mask before AI. Unmask after. Nothing leaves your
+browser."
+
 ---
 
 ## Purpose
@@ -71,7 +74,22 @@ The AI services you should be cautious about are hosted ones: your text travels 
 
 **Q: How can I be sure I can trust it?**
 
-Four ways, in increasing order of rigor:
+NameMasker is a website, but it doesn't work like one. A normal website
+sends what you type to a server; this page, once loaded, sends nothing
+anywhere. Every step — finding names, masking them, restoring them —
+happens in your browser's own memory, on your machine. There is no server
+waiting on the other end; there is nothing to send to.
+
+The masking itself is deliberately old-fashioned: find and replace. "Maya
+Chen" becomes "Student A" the same way your word processor would do it — no
+cleverness, perfectly reversible.
+
+One part does use AI: finding the names. It's a small model your browser
+downloads once and then runs by itself, the way it runs a spell-checker. It
+reads your document on your computer — nothing is sent out to be read.
+
+Don't take any of this on faith. Four ways to check, in increasing order of
+rigor:
 
 1. Turn off your internet. Load the page, disconnect, and use the tool. It works fully offline because nothing it does requires a server. This is a two-minute test anyone can run.
 2. Watch the network. Open your browser's developer tools, use the tool, and observe that no requests carry your text anywhere. The only network activity is the one-time download of the application and model.

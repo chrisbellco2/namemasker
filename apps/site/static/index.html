@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>NameMasker — mask student documents before AI, unmask after</title>
-  <meta name="description" content="A free, fully local tool that stages PII redactions in student documents so you can use AI services safely. Nothing leaves your browser.">
+  <meta name="description" content="Mask before AI. Unmask after. A free, fully local tool that stages redactions in student documents for your review. Nothing leaves your browser.">
   <meta name="theme-color" content="#1F6F60">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
@@ -18,7 +18,7 @@
   <p class="wordmark" aria-label="NameMasker">
     <span class="wm-chip"><span class="wm-real">Name</span><span class="wm-ph" aria-hidden="true">Student A</span></span>Masker
   </p>
-  <p class="tagline">Stages redactions for your review. Nothing leaves your browser.</p>
+  <p class="tagline">Mask before AI. Unmask after. Nothing leaves your browser.</p>
 </header>
 
 <main>
@@ -147,10 +147,14 @@
       <path d="M2 7 C 50 3, 110 10, 158 5" fill="none" stroke="#1f6f60" stroke-width="4.5" stroke-linecap="round"/>
       <path d="M144 6 C 150 5.6, 154 5.4, 158 5.1" fill="none" stroke="#22272b" stroke-width="4.5" stroke-linecap="butt" stroke-dasharray="3.5 4.5"/>
     </svg>
+    <p>NameMasker is a website, but it doesn’t work like one. A normal website sends what you type to a server; this page, once loaded, sends nothing anywhere. Every step — finding names, masking them, restoring them — happens in your browser’s own memory, on your machine. There is no server waiting on the other end; there is nothing to send to.</p>
+    <p>The masking itself is deliberately old-fashioned: find and replace. “Maya Chen” becomes “Student A” the same way your word processor would do it — no cleverness, perfectly reversible.</p>
+    <p>One part does use AI: finding the names. It’s a small model your browser downloads once and then runs by itself, the way it runs a spell-checker. It reads your document on your computer — nothing is sent out to be read.</p>
+    <p>Don’t take any of this on faith. Four ways to check, in increasing order of rigor:</p>
     <ol>
       <li><strong>Turn off your internet.</strong> Load the page, disconnect, and use the tool. It works fully offline because nothing it does requires a server.</li>
       <li><strong>Watch the network.</strong> Open your browser’s developer tools and observe that no request carries your text anywhere.</li>
-      <li><strong>Read the code.</strong> The entire tool is open source under the MIT license.</li>
+      <li><strong>Read the code.</strong> The entire tool is <a href="https://github.com/chrisbellco2/namemasker">open source under the MIT license</a> — every rule, every model call, every line between your document and your clipboard.</li>
       <li><strong>Trust the incentives.</strong> This tool is free, has no accounts, and collects nothing. Its only value is its credibility.</li>
     </ol>
     <p>One promise we will not make: NameMasker does not “guarantee anonymity.” No tool honestly can. It catches what software can catch, flags what software can only suspect, and puts you in the approval seat for everything. The review step is the product.</p>
@@ -158,7 +162,7 @@
 </main>
 
 <footer class="footer">
-  <p>NameMasker is free and open source (MIT). No accounts, no analytics, no server. Built by an independent educational consultant for colleagues who take student privacy seriously.</p>
+  <p>NameMasker is free and <a href="https://github.com/chrisbellco2/namemasker">open source</a> (MIT). No accounts, no analytics, no server. Built by an independent educational consultant for colleagues who take student privacy seriously.</p>
 </footer>
 
 <div class="popover" id="flag-popover" role="dialog" aria-label="Flag options" hidden></div>
