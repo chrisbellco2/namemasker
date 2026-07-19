@@ -13,9 +13,11 @@ export function scanDocument(text: string, options: ScanOptions = {}): ScanResul
   const { accumulationThreshold } = { ...DEFAULT_OPTIONS, ...options };
 
   const direct = detectDirect(text);
-  // Direct hits win over the naive name pattern and over contextual signals
-  // that fall entirely inside them (e.g. a year inside a full date).
-  const names = detectNamesNaive(text).filter((n) => !direct.some((d) => overlaps(d, n)));
+  // Direct hits win over the name layer and over contextual signals that
+  // fall entirely inside them (e.g. a year inside a full date).
+  const names = (options.nameFlags ?? detectNamesNaive(text)).filter(
+    (n) => !direct.some((d) => overlaps(d, n)),
+  );
   const contextual = detectContextual(text, options).flags.filter(
     (c) => !direct.some((d) => d.start <= c.start && c.end <= d.end),
   );

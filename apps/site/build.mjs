@@ -14,17 +14,28 @@ rmSync(dist, { recursive: true, force: true });
 mkdirSync(dist, { recursive: true });
 
 await build({
-  entryPoints: [join(root, 'src/main.ts')],
+  entryPoints: [
+    { in: join(root, 'src/main.ts'), out: 'app' },
+    { in: join(root, 'src/ner-worker.ts'), out: 'ner-worker' },
+  ],
   bundle: true,
   minify: true,
   format: 'esm',
+  platform: 'browser',
   target: 'es2022',
-  outfile: join(dist, 'app.js'),
+  outdir: dist,
   legalComments: 'none',
   alias: { '@namemasker/core': join(root, '../../packages/core/src/index.ts') },
 });
 
 cpSync(join(root, 'static'), dist, { recursive: true });
+
+// Vendor the onnxruntime wasm runtime; nothing loads from a CDN.
+const ortSrc = join(root, '../../node_modules/onnxruntime-web/dist');
+mkdirSync(join(dist, 'ort'), { recursive: true });
+for (const f of readdirSync(ortSrc)) {
+  if (/^ort-wasm.*\.(wasm|mjs)$/.test(f)) cpSync(join(ortSrc, f), join(dist, 'ort', f));
+}
 
 // Deterministic cache version: sha256 over sorted dist contents.
 const files = [];

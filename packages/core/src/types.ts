@@ -47,6 +47,11 @@ export interface ScanOptions {
   accumulationThreshold?: number;
   /** Distance (chars) within which neighboring signals contribute. Default 200. */
   proximityWindow?: number;
+  /**
+   * Name-kind flags from an external detector (e.g. an on-device NER model).
+   * When provided, these replace the built-in naive capitalized-pair layer.
+   */
+  nameFlags?: Flag[];
 }
 
 export interface AccumulationResult {
@@ -70,7 +75,7 @@ export interface ApprovedItem {
   placeholderType: PlaceholderType;
 }
 
-export const DEFAULT_OPTIONS: Required<ScanOptions> = {
+export const DEFAULT_OPTIONS: Required<Omit<ScanOptions, 'nameFlags'>> = {
   flagThreshold: 3,
   accumulationThreshold: 6,
   proximityWindow: 200,

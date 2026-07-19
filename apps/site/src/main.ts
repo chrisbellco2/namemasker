@@ -127,7 +127,81 @@ for (const tab of [tabMask, tabUnmask]) {
   });
 }
 
+// ---------- on-device name model ----------
+
+interface NerSpan {
+  label: 'PER' | 'ORG' | 'LOC' | 'MISC';
+  score: number;
+  start: number;
+  end: number;
+  text: string;
+}
+
+const NER_KIND: Record<NerSpan['label'], { category: string; type: PlaceholderType; what: string }> = {
+  PER: { category: 'ner-per', type: 'student', what: 'a person' },
+  ORG: { category: 'ner-org', type: 'org', what: 'an organization' },
+  LOC: { category: 'ner-loc', type: 'place', what: 'a place' },
+  MISC: { category: 'ner-misc', type: 'other', what: 'a proper noun' },
+};
+
+const modelStatus = $('model-status');
+const nerWorker = new Worker('ner-worker.js', { type: 'module' });
+let modelReady = false;
+let modelFailed = false;
+let queuedScan = false;
+let scanId = 0;
+
+function nerSpansToFlags(spans: NerSpan[]): Flag[] {
+  return spans.map((s) => {
+    const kind = NER_KIND[s.label];
+    return {
+      kind: 'name' as const,
+      category: kind.category,
+      start: s.start,
+      end: s.end,
+      text: s.text,
+      reason: `Looks like ${kind.what}: tagged ${s.label} by the on-device model (${Math.round(s.score * 100)}% confidence)`,
+      placeholderType: kind.type,
+    };
+  });
+}
+
+nerWorker.onmessage = (ev: MessageEvent) => {
+  const msg = ev.data as { type: string; progress?: number; id?: number; spans?: NerSpan[]; failed?: boolean };
+  if (msg.type === 'progress') {
+    modelStatus.textContent = `Downloading the on-device name model — ${Math.round(msg.progress ?? 0)}% of about 65 MB. One time; cached for offline use after this.`;
+  } else if (msg.type === 'ready') {
+    modelReady = true;
+    modelStatus.textContent = 'Name model ready. Names are detected on your device; nothing is sent anywhere.';
+    if (queuedScan) runScan();
+  } else if (msg.type === 'error') {
+    modelFailed = true;
+    modelStatus.textContent =
+      'The name model could not load. Using the basic name pattern this session; it misses more than the model does.';
+    if (queuedScan) runScan();
+  } else if (msg.type === 'result' && msg.id === scanId) {
+    finishScan(msg.failed === true ? undefined : nerSpansToFlags(msg.spans ?? []));
+  }
+};
+nerWorker.onerror = () => {
+  modelFailed = true;
+  modelStatus.textContent =
+    'The name model could not load. Using the basic name pattern this session; it misses more than the model does.';
+  if (queuedScan) runScan();
+};
+
 // ---------- masking flow ----------
+
+function runScan(): void {
+  queuedScan = false;
+  if (modelFailed) {
+    finishScan(undefined);
+    return;
+  }
+  scanId++;
+  scanStatus.textContent = 'Scanning on your device…';
+  nerWorker.postMessage({ type: 'scan', id: scanId, text: docText });
+}
 
 $('btn-mask').addEventListener('click', () => {
   docText = docInput.value;
@@ -137,7 +211,17 @@ $('btn-mask').addEventListener('click', () => {
     syncCardHeight();
     return;
   }
-  const result = scanDocument(docText);
+  if (!modelReady && !modelFailed) {
+    queuedScan = true;
+    scanStatus.textContent = 'Waiting for the on-device name model, then scanning…';
+    return;
+  }
+  runScan();
+});
+
+/** undefined nameFlags = model unavailable; core falls back to the naive pattern. */
+function finishScan(nameFlags: Flag[] | undefined): void {
+  const result = scanDocument(docText, nameFlags === undefined ? {} : { nameFlags });
   uiFlags = [];
   nextId = 1;
 
@@ -198,7 +282,7 @@ $('btn-mask').addEventListener('click', () => {
 
   review.hidden = false;
   renderAll();
-});
+}
 
 function approvedItems(): Array<{ target: string; type: PlaceholderType }> {
   return uiFlags.filter((f) => f.status === 'approved').map((f) => ({ target: f.target, type: f.type }));

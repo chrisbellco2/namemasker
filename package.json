@@ -6,6 +6,9 @@
     "packages/*",
     "apps/*"
   ],
+  "overrides": {
+    "adm-zip": "0.6.0"
+  },
   "scripts": {
     "test": "npm -w @namemasker/core run test",
     "check": "npm -w @namemasker/core run check"

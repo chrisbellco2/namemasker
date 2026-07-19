@@ -1,12 +1,15 @@
 // NameMasker service worker: cache-first for the site's own static assets,
-// nothing else. The only network activity this site ever performs is loading
-// these files; documents, mappings, and text never touch the network.
+// nothing else. The core shell is precached at install; heavyweight assets
+// (the vendored NER model and wasm runtime) are cached the first time they
+// are fetched, so the whole tool works offline after the first full visit.
+// Documents, mappings, and text never touch the network.
 const CACHE = 'namemasker-__CACHE_VERSION__';
 const ASSETS = [
   './',
   'index.html',
   'styles.css',
   'app.js',
+  'ner-worker.js',
   'manifest.webmanifest',
   'icon.svg',
   'fonts/BricolageGrotesque-var.woff2',
@@ -37,9 +40,17 @@ self.addEventListener('fetch', (event) => {
     caches.match(request, { ignoreSearch: true }).then(
       (cached) =>
         cached ??
-        fetch(request).catch(() =>
-          request.mode === 'navigate' ? caches.match('index.html') : Response.error(),
-        ),
+        fetch(request)
+          .then((response) => {
+            if (response.ok) {
+              const copy = response.clone();
+              caches.open(CACHE).then((cache) => cache.put(request, copy));
+            }
+            return response;
+          })
+          .catch(() =>
+            request.mode === 'navigate' ? caches.match('index.html') : Response.error(),
+          ),
     ),
   );
 });

@@ -213,6 +213,7 @@ button.primary:hover { background: var(--verdigris-deep); }
 .face-unmask button.primary:hover { background: #ffffff; }
 
 .status { color: var(--ink-soft); font-size: 0.95rem; }
+.model-status { margin: 0.45rem 0 0; font-size: 0.88rem; }
 .face-unmask .status { color: #aeb8bd; }
 
 /* ---- Review area ---- */

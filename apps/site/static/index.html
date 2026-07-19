@@ -37,6 +37,7 @@
             <button type="button" class="primary" id="btn-mask">Mask</button>
             <span class="status" id="scan-status" role="status" aria-live="polite"></span>
           </div>
+          <p class="status model-status" id="model-status" role="status" aria-live="polite">Preparing the on-device name model…</p>
 
           <div id="review" hidden>
             <div class="banner" id="accum-banner" hidden></div>
@@ -109,7 +110,7 @@
     <h3>Three kinds of flags</h3>
     <ul class="legend">
       <li><span class="legend-mark kind-direct">j.rivera@example.org</span> Direct identifiers — emails, phones, ID numbers, dates. Deterministic patterns, near-perfect reliability.</li>
-      <li><span class="legend-mark kind-name">Maya Chen</span> Names — people, schools, organizations. Pattern-detected today; an on-device model replaces this soon.</li>
+      <li><span class="legend-mark kind-name">Maya Chen</span> Names — people, organizations, places, detected by a small language model running on your own device, the way a spell-checker does. Nothing is sent anywhere.</li>
       <li><span class="legend-mark kind-contextual">first wrestling captain</span> Contextual flags — passages with no names that may still identify the student. Flagged for your judgment, never masked automatically.</li>
     </ul>
   </section>

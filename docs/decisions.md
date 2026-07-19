@@ -67,3 +67,34 @@ policy. Credentials are GitHub repository secrets that only Chris enters.
 Manual-trigger (workflow_dispatch) until the first deploy is confirmed
 good; then the push-to-main trigger gets uncommented. If the host turns
 out to support SSH/SFTP (Dreamhost does), switch to rsync over SSH.
+
+Superseded same evening: Chris confirmed the host is Dreamhost, so the
+workflow now uses rsync over SSH with a dedicated ed25519 deploy keypair
+(private half stored as the DEPLOY_SSH_KEY repo secret via gh, public half
+added to the Dreamhost shell user's authorized_keys). No third-party deploy
+action at all — plain rsync in a run step. Host key is trusted on first
+use (StrictHostKeyChecking=accept-new).
+
+## 9. Phase 3 NER model: dslim/distilbert-NER, int8, vendored (2026-07-18)
+
+Chris approved option 1 of three proposed (distilbert-NER ~65 MB int8 vs
+bert-base-NER ~110 MB vs GLiNER-small ~150 MB). Apache-2.0, CoNLL-2003
+labels (PER/ORG/LOC/MISC). The official dslim ONNX export is fp32 only
+(261 MB), so scripts/quantize-model.py reproduces the vendored int8
+artifact (65.8 MB) from it with onnxruntime dynamic quantization
+(QInt8, per_channel, reduce_range — transformers.js conversion defaults).
+Runs in a Web Worker via @huggingface/transformers with
+allowRemoteModels=false; model files and the onnxruntime wasm runtime are
+vendored same-origin static assets. The naive capitalized-pair layer stays
+in core as the documented fallback when the model fails to load, and core
+accepts external name flags via ScanOptions.nameFlags.
+
+Dependency security note: transformers.js pulls onnxruntime-node (unused;
+Node-only, excluded from the browser bundle) which pinned a vulnerable
+adm-zip; a root npm override forces adm-zip 0.6.0, npm audit clean.
+
+Known follow-up for a future mapping-format decision: a bare first name
+("Maya") currently gets its own placeholder (Student B) instead of linking
+to the already-mapped "Maya Chen" (Student A). Alias support means allowing
+duplicate placeholder values with longest-real-wins on unmask — a format
+semantics change that needs Chris's sign-off first.
