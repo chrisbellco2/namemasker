@@ -237,6 +237,51 @@ async function intakeFile(file: File): Promise<void> {
   syncCardHeight();
 }
 
+// Fictional sample documents. Same invented student across both, so
+// masking Example 1 then Example 2 demonstrates the map carrying over.
+const EXAMPLES: Array<{ base: string; text: string }> = [
+  {
+    base: 'example-letter',
+    text: `Dear Admissions Committee,
+
+It is my privilege to recommend Imani Okafor, the first female wrestling captain in the history of our small Quaker school outside Philadelphia. In my eleven years at Lakeside Prep, no student has balanced a state debate title with an award winning turn as oboe soloist in the Westfield Youth Symphony.
+
+Imani's transcript speaks for itself, but the numbers miss her warmth. Ask anyone on the team she captained through an undefeated junior year.
+
+Please reach me at d.alvarez@lakesideprep.org or (215) 555-0182 with any questions.
+
+Sincerely,
+Daniela Alvarez`,
+  },
+  {
+    base: 'example-transcript',
+    text: `Student Information
+Student Name: Imani Okafor
+Student Number: 884210  Grade: 11
+Birthdate: 3/14/2008  Gender: F
+#4471 Lakeside Preparatory School
+Address: 128 Chestnut Hill Lane
+Parent/Guardian: Robert Okafor  r.okafor@example.com
+
+GPA Summary
+Cumulative GPA (Weighted) 4.512
+2023-2024  Grade 11  Term 1
+AP Biology  A  5.0000  5
+AP US History  A  5.0000  5
+Honors Precalculus  A-  4.6700  5`,
+  },
+];
+
+EXAMPLES.forEach((example, i) => {
+  $(`btn-example-${i + 1}`).addEventListener('click', () => {
+    docInput.value = example.text;
+    docBaseName = example.base;
+    scanStatus.textContent = 'Loaded a fictional sample document. Press Mask to see the review flow.';
+    review.hidden = true;
+    syncCardHeight();
+  });
+});
+
 $('btn-open-file').addEventListener('click', () => $<HTMLInputElement>('file-input').click());
 $<HTMLInputElement>('file-input').addEventListener('change', (e) => {
   const file = (e.target as HTMLInputElement).files?.[0];

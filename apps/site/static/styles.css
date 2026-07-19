@@ -165,6 +165,7 @@ body.mode-unmask .card { transform: rotateY(180deg); }
   gap: 0.6rem;
   flex-wrap: wrap;
 }
+.field-tools { display: inline-flex; gap: 1rem; flex-wrap: wrap; }
 
 .linklike {
   border: 0;

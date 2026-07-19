@@ -33,7 +33,11 @@
         <div class="face face-mask" id="face-mask" role="tabpanel" aria-labelledby="tab-mask">
           <div class="field-head">
             <label class="field-label" for="doc-input">Document</label>
-            <button type="button" class="linklike" id="btn-open-file">Open a PDF or Word file…</button>
+            <span class="field-tools">
+              <button type="button" class="linklike" id="btn-example-1">Example 1</button>
+              <button type="button" class="linklike" id="btn-example-2">Example 2</button>
+              <button type="button" class="linklike" id="btn-open-file">Open a PDF or Word file…</button>
+            </span>
             <input type="file" id="file-input" accept=".pdf,.docx,.txt,.md" hidden>
           </div>
           <textarea id="doc-input" rows="10" placeholder="Paste a document to begin, or drop in a PDF or Word file." spellcheck="false"></textarea>
