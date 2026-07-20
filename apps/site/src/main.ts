@@ -132,6 +132,12 @@ const KIND_LABEL: Record<Flag['kind'], string> = {
   name: 'Name',
   contextual: 'Contextual — your judgment',
 };
+const KIND_TIP: Record<Flag['kind'], string> = {
+  direct: 'Direct identifiers (red) — emails, phone numbers, IDs, dates. Caught by exact patterns; near-certain.',
+  name: 'Names (blue) — people, organizations, places, found by the model running on your device.',
+  contextual:
+    'Contextual flags (yellow) — passages that might identify the student through context, like rare activities or narrow details. Yours to judge; never masked automatically.',
+};
 
 // ---------- mode flip ----------
 
@@ -776,7 +782,7 @@ function renderSummary(): void {
   const pending = uiFlags.filter((f) => f.status === 'pending').length;
   const byKind = (k: Flag['kind']): number => visible.filter((f) => f.flag.kind === k).length;
   summaryCounts.textContent = '';
-  const parts: Array<[string, string, number]> = [
+  const parts: Array<[Flag['kind'], string, number]> = [
     ['direct', GLYPH.direct, byKind('direct')],
     ['name', GLYPH.name, byKind('name')],
     ['contextual', GLYPH.contextual, byKind('contextual')],
@@ -785,6 +791,7 @@ function renderSummary(): void {
     const span = document.createElement('span');
     span.className = `count kind-${kind}`;
     span.textContent = `${glyph} ${count}`;
+    span.title = KIND_TIP[kind];
     summaryCounts.append(span);
   }
   const fromMap = uiFlags.filter((f) => f.fromMap).length;
@@ -792,6 +799,7 @@ function renderSummary(): void {
     const mapSpan = document.createElement('span');
     mapSpan.className = 'count-map';
     mapSpan.textContent = `${fromMap} from your map`;
+    mapSpan.title = 'Matched from your saved map — already masked, same placeholders as before.';
     summaryCounts.append(mapSpan);
   }
   const pendingSpan = document.createElement('span');
@@ -808,7 +816,10 @@ function renderSummary(): void {
 
   const approveAll = $<HTMLButtonElement>('btn-approve-all');
   approveAll.disabled = pending === 0;
-  approveAll.title = pending === 0 ? 'Nothing pending — every flag is already reviewed' : '';
+  approveAll.title =
+    pending === 0
+      ? 'Nothing pending — every flag is already reviewed'
+      : 'Approve every pending flag, including the yellow contextual ones. Right for records documents with no voice to preserve.';
 
   const pendingSafe = uiFlags.filter((f) => f.status === 'pending' && f.flag.kind !== 'contextual').length;
   const approveSafe = $<HTMLButtonElement>('btn-approve-safe');
@@ -816,7 +827,7 @@ function renderSummary(): void {
   approveSafe.title =
     pendingSafe === 0
       ? 'No direct or name flags pending'
-      : 'Approve direct identifiers and names; leave every yellow contextual flag for your judgment';
+      : 'Approve the certain flags — direct identifiers (red) and names (blue). Yellow contextual flags — passages that might identify the student through context — stay yours to judge. Right for essays, where over-masking kills the voice.';
 
   pendingNote.textContent = pending > 0 ? `${pending} flag${pending === 1 ? '' : 's'} still pending review` : '';
 }

@@ -45,7 +45,7 @@
             <textarea id="doc-input" rows="10" placeholder="Paste a document to begin, or drop in a PDF or Word file." spellcheck="false"></textarea>
           </div>
           <div class="actions">
-            <button type="button" class="primary" id="btn-mask">Mask</button>
+            <button type="button" class="primary" id="btn-mask" title="Scan the document on your device and stage replacements for your review. Nothing is masked until you approve it, and nothing leaves your browser.">Mask</button>
             <span id="domino-scan" hidden aria-hidden="true"></span>
             <span class="status" id="scan-status" role="status" aria-live="polite"></span>
           </div>
@@ -57,7 +57,7 @@
               <span id="summary-counts" aria-live="polite"></span>
               <span class="summary-hint">Click a highlight to approve, edit, or dismiss it. Select any text and press “Mask this.”</span>
               <div class="summary-actions">
-                <button type="button" id="btn-approve-safe" title="Approve direct identifiers and names; leave every yellow contextual flag for your judgment">Approve all but yellow</button>
+                <button type="button" id="btn-approve-safe" title="Approve the certain flags — direct identifiers (red) and names (blue). Yellow contextual flags — passages that might identify the student through context — stay yours to judge.">Approve all but yellow</button>
                 <button type="button" id="btn-approve-all">Approve all</button>
                 <button type="button" id="btn-reset-review" title="Put every decision back the way it was right after the scan">Reset review</button>
                 <button type="button" id="btn-toggle-rail">Details</button>
@@ -85,7 +85,7 @@
           <label class="field-label" for="unmask-input">AI output</label>
           <textarea id="unmask-input" rows="10" placeholder="Paste AI output that contains placeholders." spellcheck="false"></textarea>
           <div class="actions">
-            <button type="button" class="primary" id="btn-unmask">Unmask</button>
+            <button type="button" class="primary" id="btn-unmask" title="Restore the real names everywhere the AI kept the placeholders. Pure find-and-replace from your map, entirely on your device.">Unmask</button>
             <span class="status" id="unmask-status" role="status" aria-live="polite"></span>
           </div>
           <div class="output" id="unmask-result" hidden>
