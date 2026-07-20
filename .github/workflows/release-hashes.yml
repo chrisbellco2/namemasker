@@ -1,0 +1,63 @@
+# Reproducible-build verification, published per tagged commit.
+#
+# On every v* tag: install from the exact lockfile, build the site TWICE and
+# fail unless the two builds are byte-identical, then publish SHA-256 hashes
+# of every built file plus the @namemasker/core tarball as a GitHub release.
+# Anyone can check out the tag, run the same build, and compare hashes —
+# that is the point: the deployed site is verifiable against public source.
+name: release-hashes
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  hashes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26
+          cache: npm
+
+      - name: Install (exact lockfile)
+        run: npm ci
+
+      - name: Test
+        run: npm test
+
+      - name: Build twice, require byte-identical output
+        run: |
+          npm -w @namemasker/site run build
+          (cd apps/site/dist && find . -type f -exec sha256sum {} \; | sort -k2) > /tmp/build1.sha
+          rm -rf apps/site/dist
+          npm -w @namemasker/site run build
+          (cd apps/site/dist && find . -type f -exec sha256sum {} \; | sort -k2) > /tmp/build2.sha
+          diff /tmp/build1.sha /tmp/build2.sha
+          echo "Build is deterministic."
+
+      - name: Write SHASUMS256.txt
+        run: |
+          {
+            echo "# NameMasker ${GITHUB_REF_NAME} — SHA-256 of every built site file"
+            echo "# Rebuild from this tag with: npm ci && npm -w @namemasker/site run build"
+            echo "# commit: ${GITHUB_SHA}"
+            cat /tmp/build1.sha
+            echo "# @namemasker/core tarball:"
+            cd packages/core && npm pack --silent >/dev/null && sha256sum namemasker-core-*.tgz
+          } > SHASUMS256.txt
+          cat SHASUMS256.txt
+
+      - name: Publish hashes as the tag's release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" SHASUMS256.txt \
+            --title "NameMasker $GITHUB_REF_NAME" \
+            --notes "Reproducible-build hashes for commit \`$GITHUB_SHA\`. Verify: check out this tag, run \`npm ci && npm -w @namemasker/site run build\`, hash \`apps/site/dist\`, and compare with the attached SHASUMS256.txt." \
+            --verify-tag

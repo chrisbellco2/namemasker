@@ -201,3 +201,16 @@ risks, and a fix-it-fastest reporting note. Linked from the trust section
 and footer; served network-first and precached. Remaining Phase 6 work
 (npm publish of core, reproducible-build CI with published hashes) is
 scheduled before the Wednesday demo freeze.
+
+## 16. Reproducible-build releases; Phase 6 complete (2026-07-19)
+
+The release-hashes workflow runs on every v* tag: npm ci from the exact
+lockfile, tests, then the site is built twice and the run fails unless
+both builds are byte-identical (verified locally first: 24 files,
+byte-identical). SHA-256 hashes of every built file plus the
+@namemasker/core tarball are published as the tag's GitHub release, so
+anyone can rebuild from public source and compare against what the site
+serves. @namemasker/core 0.1.0 published to npm by Chris (interactive,
+2FA; automation would use OIDC trusted publishing per npm's 2026
+deprecation of bypass tokens). With the security page, the npm publish,
+and this workflow, Phase 6's three deliverables are shipped.
