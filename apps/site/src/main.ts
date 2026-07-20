@@ -293,9 +293,33 @@ Honors Precalculus  A-  4.6700  5`,
 
 EXAMPLES.forEach((example, i) => {
   $(`btn-example-${i + 1}`).addEventListener('click', () => {
+    // Samples must always scan fresh, on any machine, no matter how often
+    // they've been tried: purge this sample's own fictional names from the
+    // map. Real students' entries never appear in sample text.
+    let purged = 0;
+    const sampleText = EXAMPLES.map((e) => e.text).join('\n');
+    for (const real of [...Object.keys(map.mapping), ...Object.keys(map.aliases)]) {
+      if (sampleText.includes(real)) {
+        delete map.mapping[real];
+        delete map.aliases[real];
+        sessionAdded.delete(real);
+        purged++;
+      }
+    }
+    const beforeWatch = map.watchlist.length;
+    map.watchlist = map.watchlist.filter((t) => !sampleText.includes(t));
+    purged += beforeWatch - map.watchlist.length;
+    if (purged > 0) {
+      saveMap();
+      renderWatchlist();
+      renderMappingStrip();
+    }
     docInput.value = example.text;
     docBaseName = example.base;
-    scanStatus.textContent = 'Loaded a fictional sample document. Press Mask to see the review flow.';
+    scanStatus.textContent =
+      purged > 0
+        ? 'Loaded a fictional sample document; its names from earlier tries were cleared from your map so it scans fresh. Press Mask.'
+        : 'Loaded a fictional sample document. Press Mask to see the review flow.';
     review.hidden = true;
     updateDominoPeek();
     syncCardHeight();
