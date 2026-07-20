@@ -262,8 +262,12 @@ async function intakeFile(file: File): Promise<void> {
   syncCardHeight();
 }
 
-// Fictional sample documents. Same invented student across both, so
-// masking Example 1 then Example 2 demonstrates the map carrying over.
+// Fictional sample documents: one invented student across all four, so
+// masking one then another demonstrates the map carrying placeholders over.
+// Each type shows a different flag mix: the letter has everything, the
+// essay is deliberately contextual-heavy (the "Approve all but yellow"
+// story), the notes are a realistic IEC meeting record, the transcript is
+// a records document with no voice to preserve.
 const EXAMPLES: Array<{ base: string; text: string }> = [
   {
     base: 'example-letter',
@@ -277,6 +281,26 @@ Please reach me at d.alvarez@lakesideprep.org or (215) 555-0182 with any questio
 
 Sincerely,
 Daniela Alvarez`,
+  },
+  {
+    base: 'example-essay',
+    text: `There is a moment before every match when the gym goes quiet and all I can hear is my own breathing. I chased that quiet for three years, and in my junior year I became the first girl to captain the wrestling team in my small Quaker school's hundred-year history. We are a school of 280 students outside Philadelphia; nothing stays secret there for long, and by Monday morning everyone had an opinion about whether I belonged on that mat.
+
+The oboe taught me the opposite lesson. In the Westfield Youth Symphony I am one reed among ninety players, and nobody applauds the second oboe alone. I needed both rooms: the one that watched me and the one that absorbed me.
+
+My mother, Adaeze Okafor, drove me forty minutes each way to every rehearsal for six years. When I won the state debate title last spring, she told me the trophy belonged in the car. She was right. Most of what I am was built in transit, between one version of quiet and another.`,
+  },
+  {
+    base: 'example-notes',
+    text: `Meeting notes — Imani Okafor (junior, Lakeside Prep, Class of 2027)
+
+Family: father Robert Okafor, r.okafor@example.com, (215) 555-0147. Mother Adaeze works Thursdays; prefers evening calls.
+
+Profile: first female wrestling captain at her school; oboe in the Westfield Youth Symphony; state debate title last spring. GPA 4.51 weighted. Teachers describe her as steady, wry, beloved.
+
+Early list: Swarthmore, Oberlin, Georgetown. Wants small classes, values community, unsure about distance from home.
+
+Next steps: essay draft by April 1; ask Coach Daniels about the recommendation; June SAT registration.`,
   },
   {
     base: 'example-transcript',

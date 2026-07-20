@@ -172,7 +172,8 @@ body.mode-unmask .card { transform: rotateY(180deg); }
   gap: 0.6rem;
   flex-wrap: wrap;
 }
-.field-tools { display: inline-flex; gap: 1rem; flex-wrap: wrap; }
+.field-tools { display: inline-flex; gap: 1rem; flex-wrap: wrap; align-items: baseline; }
+.field-tools-label { font-size: 0.92rem; color: var(--ink-soft); }
 
 .linklike {
   border: 0;
