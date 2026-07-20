@@ -1,4 +1,4 @@
-import type { Flag } from './types';
+import type { Flag } from './types.js';
 
 /**
  * Layer 2, Phase 2 form: a deliberately naive capitalized-pair pattern.

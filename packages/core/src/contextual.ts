@@ -1,5 +1,5 @@
-import type { ContextSignal, Flag, PlaceholderType, ScanOptions } from './types';
-import { DEFAULT_OPTIONS } from './types';
+import type { ContextSignal, Flag, PlaceholderType, ScanOptions } from './types.js';
+import { DEFAULT_OPTIONS } from './types.js';
 
 /**
  * Layer 3: contextual heuristics. Weighted rules produce signals; each signal

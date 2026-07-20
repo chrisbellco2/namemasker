@@ -1,4 +1,4 @@
-import type { ApprovedItem, Mapping, PlaceholderType, StudentMap } from './types';
+import type { ApprovedItem, Mapping, PlaceholderType, StudentMap } from './types.js';
 
 /**
  * Mapping and restore. The mapping is a flat JSON object, real string ->

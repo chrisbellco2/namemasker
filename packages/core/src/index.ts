@@ -21,16 +21,16 @@ export type {
   StudentMap,
   KnownTerm,
   ApprovedItem,
-} from './types';
-export { DEFAULT_OPTIONS } from './types';
+} from './types.js';
+export { DEFAULT_OPTIONS } from './types.js';
 
-export { detectDirect } from './direct';
-export { detectNamesNaive } from './names';
-export { detectContextual, collectSignals } from './contextual';
-export type { ContextualResult } from './contextual';
-export { scanDocument } from './scan';
+export { detectDirect } from './direct.js';
+export { detectNamesNaive } from './names.js';
+export { detectContextual, collectSignals } from './contextual.js';
+export type { ContextualResult } from './contextual.js';
+export { scanDocument } from './scan.js';
 
-export { detectKnownTerms } from './scan';
+export { detectKnownTerms } from './scan.js';
 
 export {
   nextPlaceholder,
@@ -45,5 +45,5 @@ export {
   applyMap,
   serializeStudentMap,
   parseStudentMap,
-} from './mapping';
-export type { MaskResult } from './mapping';
+} from './mapping.js';
+export type { MaskResult } from './mapping.js';

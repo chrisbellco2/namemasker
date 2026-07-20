@@ -3,17 +3,44 @@
   "version": "0.1.0",
   "description": "Local PII detection, masking, and restore engine for NameMasker. Runs in browser and Node; no network, no telemetry.",
   "license": "MIT",
+  "author": "Chris Bell",
+  "homepage": "https://namemasker.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chrisbellco2/namemasker.git",
+    "directory": "packages/core"
+  },
+  "bugs": "https://github.com/chrisbellco2/namemasker/issues",
+  "keywords": [
+    "pii",
+    "redaction",
+    "masking",
+    "privacy",
+    "student-privacy",
+    "local-first",
+    "ner"
+  ],
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
   "files": [
     "dist"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
     "check": "tsc --noEmit",
-    "build": "tsc -p tsconfig.build.json"
+    "build": "tsc -p tsconfig.build.json",
+    "prepublishOnly": "npm run check && npm test && npm run build"
   },
   "devDependencies": {
     "typescript": "7.0.2",

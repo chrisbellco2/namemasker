@@ -1,8 +1,8 @@
-import type { Flag, KnownTerm, ScanOptions, ScanResult } from './types';
-import { DEFAULT_OPTIONS } from './types';
-import { detectDirect, overlaps } from './direct';
-import { detectNamesNaive } from './names';
-import { detectContextual } from './contextual';
+import type { Flag, KnownTerm, ScanOptions, ScanResult } from './types.js';
+import { DEFAULT_OPTIONS } from './types.js';
+import { detectDirect, overlaps } from './direct.js';
+import { detectNamesNaive } from './names.js';
+import { detectContextual } from './contextual.js';
 
 function escapeRegExp(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');

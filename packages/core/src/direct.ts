@@ -1,4 +1,4 @@
-import type { Flag, PlaceholderType } from './types';
+import type { Flag, PlaceholderType } from './types.js';
 
 /**
  * Layer 1: deterministic regex. Emails, phones, ID/SSN patterns, dates,
