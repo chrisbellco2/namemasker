@@ -121,8 +121,9 @@ NameMasker's job is to make sure what travels is the masked version.
 What the tool never does. No accounts, no analytics, no cookies, no
 tracking of any kind. After the page loads, it makes no network requests.
 Your documents, your map, and your students' names exist only in your
-browser and in files you choose to save. You can verify each of those
-claims yourself — the main page explains how.
+browser and in files you choose to save. Like every web server, ours keeps
+standard access logs; we look only at aggregate counts. You can verify
+each of those claims yourself — the main page explains how.
 
 The one sensitive file. Exporting a map creates the only sensitive artifact
 this tool ever makes: a small file pairing real names with placeholders.
