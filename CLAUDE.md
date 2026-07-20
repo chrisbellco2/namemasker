@@ -55,9 +55,14 @@ Mapping is a flat JSON object, real string to placeholder. Placeholder sequences
 
 ## Modes
 
-- Essay mode (conservative): direct identifiers staged, voice preserved, contextual passages flagged only.
-- Records mode (aggressive): names, birthdates, IDs, addresses, school names all staged.
-Same engine, threshold profiles in core, selectable in UI. Phase 5.
+Phase 5 as originally scoped (a persistent Essay/Records mode toggle) was
+rejected by Chris as invisible global state; see decisions.md #14. What
+shipped instead: the mode distinction collapsed into a scoped bulk action —
+"Approve all" (aggressive, right for records) beside "Approve all but
+yellow" (conservative, voice-preserving, right for essays) — chosen at the
+moment it matters, in view of the actual flags. Core keeps per-caller
+profiles via ScanOptions (thresholds, knownTerms, nameFlags); the private
+platform selects behavior programmatically per document type.
 
 ## Build phases
 

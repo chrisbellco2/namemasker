@@ -497,6 +497,14 @@ $('btn-approve-all').addEventListener('click', () => {
   renderAll();
 });
 
+// The essay-safe bulk action: mask the certain stuff, never bulk-mask voice.
+$('btn-approve-safe').addEventListener('click', () => {
+  for (const f of uiFlags) {
+    if (f.status === 'pending' && f.flag.kind !== 'contextual') approve(f);
+  }
+  renderAll();
+});
+
 $('btn-toggle-rail').addEventListener('click', () => {
   const off = rail.toggleAttribute('hidden');
   workbench.dataset['rail'] = off ? 'off' : 'on';
@@ -750,6 +758,14 @@ function renderSummary(): void {
   const approveAll = $<HTMLButtonElement>('btn-approve-all');
   approveAll.disabled = pending === 0;
   approveAll.title = pending === 0 ? 'Nothing pending — every flag is already reviewed' : '';
+
+  const pendingSafe = uiFlags.filter((f) => f.status === 'pending' && f.flag.kind !== 'contextual').length;
+  const approveSafe = $<HTMLButtonElement>('btn-approve-safe');
+  approveSafe.disabled = pendingSafe === 0;
+  approveSafe.title =
+    pendingSafe === 0
+      ? 'No direct or name flags pending'
+      : 'Approve direct identifiers and names; leave every yellow contextual flag for your judgment';
 
   pendingNote.textContent = pending > 0 ? `${pending} flag${pending === 1 ? '' : 's'} still pending review` : '';
 }

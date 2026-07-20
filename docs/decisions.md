@@ -178,3 +178,16 @@ practice, mentioned generically per the amended charter rule (no name, no
 link, no branding; NameMasker is not a funnel) — and closes with "free, of
 course." The four verification steps remain, reframed as "a promise is
 only worth what you can check."
+
+## 14. Phase 5 redefined: no mode toggle, a scoped Approve all (2026-07-19)
+
+Chris challenged whether an Essay/Records mode was worth the UI and mental
+model; on inspection the toggle's case collapsed — "Approve all" already
+gives the records workflow one-click bulk staging, so a persistent mode
+would have bought one click and a threshold tweak at the price of
+invisible global state. Shipped instead: "Approve all but yellow" beside
+"Approve all" — the essay-safe bulk action that masks direct identifiers
+and names while leaving every contextual judgment to the professional.
+The choice happens at the moment it matters, in view of the flags, with
+no standing state. Core profiles remain available to API consumers via
+ScanOptions. Phase 5 is closed by this decision.
