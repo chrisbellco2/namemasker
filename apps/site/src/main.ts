@@ -505,6 +505,33 @@ $('btn-approve-safe').addEventListener('click', () => {
   renderAll();
 });
 
+// The way back from any bulk action: every decision returns to its
+// post-scan state, and map entries added during this review are removed.
+$('btn-reset-review').addEventListener('click', () => {
+  if (
+    sessionAdded.size > 0 &&
+    !confirm(
+      `Reset all decisions for this document? ${sessionAdded.size} entr${sessionAdded.size === 1 ? 'y' : 'ies'} added to your map during this review will be removed. The rest of your map is untouched.`,
+    )
+  ) {
+    return;
+  }
+  for (const real of sessionAdded) {
+    delete map.mapping[real];
+    delete map.aliases[real];
+  }
+  sessionAdded.clear();
+  saveMap();
+  for (const f of uiFlags) {
+    f.status = f.fromMap ? 'approved' : 'pending';
+  }
+  // Watchlist hits were pre-approved at scan time; restore that state.
+  for (const f of uiFlags) {
+    if (f.flag.category === 'known-term') approve(f);
+  }
+  renderAll();
+});
+
 $('btn-toggle-rail').addEventListener('click', () => {
   const off = rail.toggleAttribute('hidden');
   workbench.dataset['rail'] = off ? 'off' : 'on';
