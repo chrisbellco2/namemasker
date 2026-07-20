@@ -191,3 +191,13 @@ and names while leaving every contextual judgment to the professional.
 The choice happens at the moment it matters, in view of the flags, with
 no standing state. Core profiles remain available to API consumers via
 ScanOptions. Phase 5 is closed by this decision.
+
+## 15. Public security page ships (2026-07-19)
+
+Phase 6, first of three. security.html carries the threat model in plain
+language, Chris-approved copy: what the tool exists for, what it never
+does, the map file as the one sensitive artifact, four honest residual
+risks, and a fix-it-fastest reporting note. Linked from the trust section
+and footer; served network-first and precached. Remaining Phase 6 work
+(npm publish of core, reproducible-build CI with published hashes) is
+scheduled before the Wednesday demo freeze.

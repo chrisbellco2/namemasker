@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Security — what NameMasker protects, and what it can’t</title>
+  <meta name="description" content="NameMasker's threat model in plain language: what the tool protects against, what it never does, and what can still go wrong.">
+  <meta name="theme-color" content="#1F6F60">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="preload" href="fonts/BricolageGrotesque-var.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/PublicSans-var.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="topbar">
+  <p class="wordmark" aria-label="NameMasker">
+    <span class="wm-chip"><span class="wm-real">Name</span></span>Masker
+  </p>
+  <p class="tagline"><a href="./">← Back to the tool</a></p>
+</header>
+
+<main>
+  <section class="prose">
+    <h2>What NameMasker protects — and what it can’t</h2>
+    <svg class="tail-underline" width="168" height="12" viewBox="0 0 168 12" aria-hidden="true">
+      <path d="M2 7 C 50 3, 110 10, 158 5" fill="none" stroke="#1f6f60" stroke-width="4.5" stroke-linecap="round"/>
+      <path d="M144 6 C 150 5.6, 154 5.4, 158 5.1" fill="none" stroke="#22272b" stroke-width="4.5" stroke-linecap="butt" stroke-dasharray="3.5 4.5"/>
+    </svg>
+
+    <p><strong>The threat this tool exists for:</strong> when you paste a student’s document into a hosted AI service, their identity travels to a company’s servers, where it may be logged, retained, or used under terms you didn’t negotiate. NameMasker’s job is to make sure what travels is the masked version.</p>
+
+    <h3>What the tool never does</h3>
+    <p>No accounts, no analytics, no cookies, no tracking of any kind. After the page loads, it makes no network requests. Your documents, your map, and your students’ names exist only in your browser and in files you choose to save. You can verify each of those claims yourself — the <a href="./">main page</a> explains how (the offline test, the network inspector, the open source code).</p>
+
+    <h3>The one sensitive file</h3>
+    <p>Exporting a map creates the only sensitive artifact this tool ever makes: a small file pairing real names with placeholders. Treat it like the student files it lives beside. Anyone who has it can unmask documents masked with it. NameMasker never transmits it; protecting it on your machine is your job, and nothing about that file is our business.</p>
+
+    <h3>What can still go wrong — honestly</h3>
+    <ol>
+      <li><strong>The scan misses something and you approve the copy anyway.</strong> The tool catches what software can catch. It will miss things — especially unusual names and formatting. The review step exists because your eyes are the last line, not ours.</li>
+      <li><strong>Context identifies the student even after masking.</strong> “The first female wrestling captain at a small Quaker school outside Philadelphia” can identify someone with zero names in it. The tool flags what it can and counts the accumulation, but only you know your student’s world.</li>
+      <li><strong>The masked text is still the student’s story.</strong> Masking removes identity, not content. Whether the content itself is appropriate to share with an AI service is a professional judgment this tool cannot make for you.</li>
+      <li><strong>Your device is the perimeter.</strong> NameMasker runs inside your browser; it inherits your machine’s security. A compromised computer or browser extension can read anything you type anywhere, this site included.</li>
+    </ol>
+
+    <h3>What we’d fix fastest</h3>
+    <p>If you find a name pattern the scan misses, <a href="https://github.com/chrisbellco2/namemasker/issues">tell us on GitHub</a> — reported misses become permanent test cases, with credit. If you believe you’ve found a way this page’s promises are false, that’s the most important bug this project can have.</p>
+  </section>
+</main>
+
+<footer class="footer">
+  <p><a href="./">NameMasker</a> is free and <a href="https://github.com/chrisbellco2/namemasker">open source</a> (MIT). No accounts, no analytics, no server.</p>
+</footer>
+
+</body>
+</html>

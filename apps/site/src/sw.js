@@ -7,6 +7,7 @@ const CACHE = 'namemasker-__CACHE_VERSION__';
 const ASSETS = [
   './',
   'index.html',
+  'security.html',
   'styles.css',
   'app.js',
   'ner-worker.js',
@@ -34,7 +35,7 @@ self.addEventListener('activate', (event) => {
 // Small shell files go network-first so a deploy is picked up on the very
 // next online load; the heavyweight, rarely-changing assets (model, wasm,
 // fonts) stay cache-first. Offline, everything falls back to cache.
-const SHELL = new Set(['/', '/index.html', '/styles.css', '/app.js', '/ner-worker.js', '/manifest.webmanifest']);
+const SHELL = new Set(['/', '/index.html', '/security.html', '/styles.css', '/app.js', '/ner-worker.js', '/manifest.webmanifest']);
 
 self.addEventListener('fetch', (event) => {
   const request = event.request;

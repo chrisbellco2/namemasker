@@ -67,8 +67,8 @@ The AI services you should be cautious about are hosted ones: your text travels 
 **Q: Give me examples of how to use it.**
 
 - Recommendation letters. Mask a draft, ask an AI to tighten the prose, unmask the result, done. The most common case.
-- Essay feedback. Use Essay mode, which is conservative: it masks direct identifiers but preserves the student's voice and story details for your review, because an over-masked essay is useless to evaluate. Expect more yellow flags here; essays are where contextual identification lives.
-- Transcripts and score reports. Use Records mode, which is aggressive: names, birthdates, ID numbers, addresses, and school names are all staged. Then ask an AI to summarize trends or explain an unfamiliar grading system.
+- Essay feedback. Use "Approve all but yellow": direct identifiers and names get masked, while every contextual flag stays yours to judge — because an over-masked essay is useless to evaluate. Expect more yellow flags here; essays are where contextual identification lives.
+- Transcripts and score reports. Use "Approve all" — a records document has no voice to preserve, so stage everything, glance, and copy. Then ask an AI to summarize trends or explain an unfamiliar grading system.
 - Notes to external professionals. Mask your meeting notes before asking an AI to draft a summary for a tutor or specialist.
 - Season-long work with one student. Save the student's mapping file. Every future document uses the same placeholders, so your AI assistant's context about "Student A" accumulates coherently across months.
 
@@ -108,3 +108,46 @@ A promise is only worth what you can check. Four ways, easiest first:
 4. Trust the incentives. This tool is free, has no accounts, collects no analytics on your documents, and is published under the name of a working IEC practice. Its only value is its credibility. A privacy tool that quietly phoned home would be worthless to its maker the day it was discovered, and the open code means it would be discovered.
 
 And one trust question to keep pointed at us rather than the technology: no automated tool catches everything. NameMasker will miss things, especially contextual identification that requires knowing the student. That is why the review step exists and why the page will never tell you a document is "safe," only that it found what it found. The professional judgment is yours. The tool's job is to make exercising it fast.
+
+## Security page (security.html)
+
+# What NameMasker protects — and what it can't
+
+The threat this tool exists for: when you paste a student's document into a
+hosted AI service, their identity travels to a company's servers, where it
+may be logged, retained, or used under terms you didn't negotiate.
+NameMasker's job is to make sure what travels is the masked version.
+
+What the tool never does. No accounts, no analytics, no cookies, no
+tracking of any kind. After the page loads, it makes no network requests.
+Your documents, your map, and your students' names exist only in your
+browser and in files you choose to save. You can verify each of those
+claims yourself — the main page explains how.
+
+The one sensitive file. Exporting a map creates the only sensitive artifact
+this tool ever makes: a small file pairing real names with placeholders.
+Treat it like the student files it lives beside. Anyone who has it can
+unmask documents masked with it. NameMasker never transmits it; protecting
+it on your machine is your job, and nothing about that file is our
+business.
+
+What can still go wrong — honestly:
+1. The scan misses something and you approve the copy anyway. The tool
+   catches what software can catch. It will miss things — especially
+   unusual names and formatting. The review step exists because your eyes
+   are the last line, not ours.
+2. Context identifies the student even after masking. "The first female
+   wrestling captain at a small Quaker school outside Philadelphia" can
+   identify someone with zero names in it. The tool flags what it can and
+   counts the accumulation, but only you know your student's world.
+3. The masked text is still the student's story. Masking removes identity,
+   not content. Whether the content itself is appropriate to share with an
+   AI service is a professional judgment this tool cannot make for you.
+4. Your device is the perimeter. NameMasker runs inside your browser; it
+   inherits your machine's security. A compromised computer or browser
+   extension can read anything you type anywhere, this site included.
+
+What we'd fix fastest. If you find a name pattern the scan misses, tell us
+on GitHub — reported misses become permanent test cases, with credit. If
+you believe you've found a way this page's promises are false, that's the
+most important bug this project can have.
