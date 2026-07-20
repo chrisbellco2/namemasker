@@ -22,23 +22,28 @@ const RULES: DirectRule[] = [
     patterns: [/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g],
   },
   {
-    category: 'phone',
-    placeholderType: 'phone',
-    reason: 'Phone number (deterministic pattern)',
-    patterns: [/(?:\+1[\s.-]?)?(?:\(\d{3}\)[\s.-]?|\b\d{3}[\s.-])\d{3}[\s.-]\d{4}\b/g],
-  },
-  {
     category: 'ssn',
     placeholderType: 'id',
     reason: 'SSN-format number (deterministic pattern)',
     patterns: [/\b\d{3}-\d{2}-\d{4}\b/g],
   },
   {
+    // Before phone, so a 10-digit labeled ID stays an ID, not a phone.
     category: 'id',
     placeholderType: 'id',
     reason: 'Labeled ID number (deterministic pattern)',
     patterns: [
       /\b(?:student\s+(?:id|number|no)|id(?:\s+(?:number|no))?|case\s+(?:number|no))\s*[#:.]?\s*\d{4,12}\b/gi,
+    ],
+  },
+  {
+    category: 'phone',
+    placeholderType: 'phone',
+    reason: 'Phone number (deterministic pattern)',
+    patterns: [
+      /(?:\+1[\s.-]?)?(?:\(\d{3}\)[\s.-]?|\b\d{3}[\s.-])\d{3}[\s.-]\d{4}\b/g,
+      // Bare digits, no separators: 3035551212 or 13035551212.
+      /\b1?\d{10}\b/g,
     ],
   },
   {

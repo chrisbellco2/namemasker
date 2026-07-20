@@ -96,6 +96,12 @@ export interface KnownTerm {
   placeholderType?: PlaceholderType;
   /** Optional reason override shown on the flag. */
   label?: string;
+  /**
+   * Match regardless of letter case (default true): notes-style lowercase
+   * prose ("met with jimmy") still flags the known term "Jimmy". Set false
+   * for terms that collide with common words ("Will", "Sunny").
+   */
+  caseInsensitive?: boolean;
 }
 
 /** A flag the professional approved, possibly with an edited replacement type. */

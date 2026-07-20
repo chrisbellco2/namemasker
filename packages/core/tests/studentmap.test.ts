@@ -101,4 +101,34 @@ describe('knownTerms: caller-supplied truth', () => {
     expect(names).toHaveLength(1);
     expect(names[0]!.category).toBe('known-term');
   });
+
+  // Corpus: dash integration review, 2026-07-20 — three reported gaps.
+  it('matches lowercase notes-style prose by default (corpus: dash review)', () => {
+    const result = scanDocument('met with jimmy about his essay', { knownTerms: [{ term: 'Jimmy' }] });
+    expect(result.flags.some((f) => f.category === 'known-term' && f.text === 'jimmy')).toBe(true);
+  });
+
+  it('matches inside markdown italics but not inside accented words (corpus: dash review)', () => {
+    const italic = scanDocument('see _jimmy_ tomorrow', { knownTerms: [{ term: 'Jimmy' }] });
+    expect(italic.flags.some((f) => f.category === 'known-term')).toBe(true);
+    const accent = scanDocument("L'Année scolaire begins.", { knownTerms: [{ term: 'Ann' }] });
+    expect(accent.flags.some((f) => f.category === 'known-term')).toBe(false);
+  });
+
+  it('caseInsensitive: false opts a term out', () => {
+    const result = scanDocument('she will apply early', {
+      knownTerms: [{ term: 'Will', caseInsensitive: false }],
+    });
+    expect(result.flags.some((f) => f.category === 'known-term')).toBe(false);
+  });
+
+  it('a known term inside an email yields to the whole address (corpus: dash review)', () => {
+    const result = scanDocument('write to maya.chen@gmail.com today', {
+      knownTerms: [{ term: 'Maya' }, { term: 'Chen' }],
+    });
+    const emails = result.flags.filter((f) => f.category === 'email');
+    expect(emails).toHaveLength(1);
+    expect(emails[0]!.text).toBe('maya.chen@gmail.com');
+    expect(result.flags.filter((f) => f.category === 'known-term')).toHaveLength(0);
+  });
 });

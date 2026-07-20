@@ -17,9 +17,17 @@ describe('direct layer: phones', () => {
     '215-555-0148',
     '215.555.0148',
     '+1 215 555 0148',
+    '3035551212',
+    '13035551212',
   ])('detects %s', (phone) => {
     const flags = detectDirect(`Call ${phone} anytime.`);
     expect(flags.some((f) => f.category === 'phone' && f.text.includes('555'))).toBe(true);
+  });
+
+  it('a 10-digit labeled ID stays an ID, not a phone (corpus: dash review)', () => {
+    const flags = detectDirect('Student Number: 1234567890 on file.');
+    expect(flags.some((f) => f.category === 'id')).toBe(true);
+    expect(flags.some((f) => f.category === 'phone')).toBe(false);
   });
 });
 

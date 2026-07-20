@@ -1,6 +1,6 @@
 {
   "name": "@namemasker/core",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Local PII detection, masking, and restore engine for NameMasker. Runs in browser and Node; no network, no telemetry.",
   "license": "MIT",
   "author": "Chris Bell",

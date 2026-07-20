@@ -8,12 +8,21 @@ function escapeRegExp(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-/** Stage every whole-token occurrence of the caller's known terms. */
+/**
+ * Stage every whole-token occurrence of the caller's known terms.
+ * Case-insensitive by default (notes-style lowercase prose is real prose),
+ * with Unicode letter/digit boundaries so "Ann" never fires inside "Année"
+ * but does fire inside markdown italics like "_jimmy_".
+ */
 export function detectKnownTerms(text: string, terms: KnownTerm[]): Flag[] {
   const flags: Flag[] = [];
   for (const t of terms) {
     if (t.term.trim().length === 0) continue;
-    const re = new RegExp(`(?<!\\w)${escapeRegExp(t.term)}(?!\\w)`, 'g');
+    const flagsStr = (t.caseInsensitive ?? true) ? 'giu' : 'gu';
+    const re = new RegExp(
+      `(?<![\\p{L}\\p{N}])${escapeRegExp(t.term)}(?![\\p{L}\\p{N}])`,
+      flagsStr,
+    );
     let m: RegExpExecArray | null;
     while ((m = re.exec(text)) !== null) {
       flags.push({
@@ -39,9 +48,16 @@ export function detectKnownTerms(text: string, terms: KnownTerm[]): Flag[] {
 export function scanDocument(text: string, options: ScanOptions = {}): ScanResult {
   const { accumulationThreshold } = { ...DEFAULT_OPTIONS, ...options };
 
-  // Known terms are caller-supplied truth; they win every overlap.
-  const known = detectKnownTerms(text, options.knownTerms ?? []);
-  const direct = detectDirect(text).filter((d) => !known.some((k) => overlaps(k, d)));
+  // Known terms are caller-supplied truth and win overlaps — with one
+  // refinement: a known term contained INSIDE a direct identifier (the
+  // "maya" in maya.chen@gmail.com) yields to it, so the whole address
+  // masks as one email instead of fragmenting around a name.
+  const knownAll = detectKnownTerms(text, options.knownTerms ?? []);
+  const directRaw = detectDirect(text);
+  const known = knownAll.filter(
+    (k) => !directRaw.some((d) => d.start <= k.start && k.end <= d.end),
+  );
+  const direct = directRaw.filter((d) => !known.some((k) => overlaps(k, d)));
   // Direct hits win over the name layer and over contextual signals that
   // fall entirely inside them (e.g. a year inside a full date).
   const names = (options.nameFlags ?? detectNamesNaive(text)).filter(

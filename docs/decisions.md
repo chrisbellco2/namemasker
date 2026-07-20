@@ -214,3 +214,18 @@ serves. @namemasker/core 0.1.0 published to npm by Chris (interactive,
 2FA; automation would use OIDC trusted publishing per npm's 2026
 deprecation of bypass tokens). With the security page, the npm publish,
 and this workflow, Phase 6's three deliverables are shipped.
+
+## 17. 0.2.0 — dash-review corpus round (2026-07-20)
+
+First community-style report, from the dashboard integration review; all
+three verified against source and shipped additively with corpus tests:
+(1) knownTerms now match case-insensitively by default (per-term
+caseInsensitive: false opt-out) with Unicode letter/digit boundaries —
+lowercase notes prose flags "Jimmy", markdown _jimmy_ matches, "Ann"
+never fires inside "Année". (2) Precedence refinement: a known term
+contained inside a direct identifier yields to it, so
+maya.chen@gmail.com masks as one Email rather than fragmenting around a
+known name. (3) Phones without separators (3035551212, 13035551212) now
+match, and the labeled-ID rule moved ahead of phone so 10-digit student
+numbers keep the ID label. Published as @namemasker/core 0.2.0; the dash
+pins it exact and runs a parity harness before switching detectors.
