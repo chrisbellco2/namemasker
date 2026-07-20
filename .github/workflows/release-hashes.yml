@@ -49,7 +49,7 @@ jobs:
             echo "# commit: ${GITHUB_SHA}"
             cat /tmp/build1.sha
             echo "# @namemasker/core tarball:"
-            cd packages/core && npm pack --silent >/dev/null && sha256sum namemasker-core-*.tgz
+            ( cd packages/core && npm pack --silent >/dev/null && sha256sum namemasker-core-*.tgz )
           } > SHASUMS256.txt
           cat SHASUMS256.txt
 
