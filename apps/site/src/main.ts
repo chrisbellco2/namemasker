@@ -14,7 +14,7 @@ import {
   type StudentMap,
 } from '@namemasker/core';
 import { extractTextFromFile } from './intake';
-import { DOMINO_PEEK, DOMINO_SCAN, DOMINO_DONE } from './domino';
+import { DOMINO_PEEK, DOMINO_SCAN, DOMINO_DONE, DOMINO_UNMASKED } from './domino';
 
 // ---------- state ----------
 
@@ -118,6 +118,9 @@ const GLYPH: Record<Flag['kind'], string> = { direct: '●', name: '◆', contex
 // the approve card; all reviewed -> hop to the copy row, paw on mask.
 
 const dominoGuide = $('domino-guide');
+// The Unmask face's resident: static, mask pushed up — names come back here.
+const dominoUnmask = document.getElementById('domino-unmask');
+if (dominoUnmask !== null) dominoUnmask.innerHTML = DOMINO_UNMASKED;
 let scanInFlight = false;
 type DominoState = 'doc' | 'scan' | 'review' | 'output' | 'hidden';
 let dominoState: DominoState = 'hidden';

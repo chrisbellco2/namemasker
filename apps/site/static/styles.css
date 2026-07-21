@@ -218,6 +218,24 @@ textarea.dropping {
 .summary-bar,
 .banner { scroll-margin-top: 12px; }
 
+#domino-unmask {
+  position: absolute;
+  top: -36px;
+  right: 40px;
+  pointer-events: none;
+  line-height: 0;
+}
+#domino-unmask svg { height: 58px; width: auto; }
+
+.unmask-hint { margin: 0 0 0.6rem; }
+.unmask-hint code {
+  font-family: var(--mono);
+  font-size: 0.88em;
+  border: 1px solid #3a4247;
+  border-radius: 0.3rem;
+  padding: 0 0.25rem;
+}
+
 .tail-underline { display: block; margin: -2px 0 10px; }
 
 .howit-figure { overflow-x: auto; margin: 0.6rem 0 1.2rem; }

@@ -28,6 +28,27 @@ export const DOMINO_PEEK = `
   <rect x="106" y="56" width="12" height="8" rx="4" fill="${PAPER}" stroke="${GRAPHITE}" stroke-width="2"/>
 </svg>`;
 
+/**
+ * The Unmask face's Domino: mask pushed up onto his forehead, bare eyes —
+ * this is the side where masks come off. Drawn for the dark card: ears
+ * carry a paper stroke so they read against graphite.
+ */
+export const DOMINO_UNMASKED = `
+<svg width="150" height="64" viewBox="0 0 150 64" aria-hidden="true">
+  <path d="M22 59 C 44 42, 64 54, 92 60" fill="none" stroke="${VERDIGRIS}" stroke-width="9" stroke-linecap="round"/>
+  <path d="M22 59 C 44 42, 64 54, 92 60" fill="none" stroke="${GRAPHITE}" stroke-width="9" stroke-linecap="butt" stroke-dasharray="7 11"/>
+  <circle cx="89" cy="12" r="8" fill="${GRAPHITE}" stroke="${PAPER}" stroke-width="1.5"/><circle cx="115" cy="12" r="8" fill="${GRAPHITE}" stroke="${PAPER}" stroke-width="1.5"/>
+  <circle cx="89" cy="13.5" r="4" fill="${PAPER}"/><circle cx="115" cy="13.5" r="4" fill="${PAPER}"/>
+  <circle cx="102" cy="32" r="22" fill="${PAPER}" stroke="${GRAPHITE}" stroke-width="2.5"/>
+  <path d="M84 21.5 Q92 15.5 102 17 Q112 15.5 120 21.5 Q112 26.5 102 25 Q92 26.5 84 21.5 Z" fill="${VERDIGRIS}"/>
+  <ellipse cx="93.5" cy="33.5" rx="4.8" ry="4.5" fill="#fff" stroke="${GRAPHITE}" stroke-width="1.4"/><circle cx="94.2" cy="34.2" r="2.3" fill="${GRAPHITE}"/><circle cx="95" cy="32.9" r=".8" fill="#fff"/>
+  <ellipse cx="110.5" cy="33.5" rx="4.8" ry="4.5" fill="#fff" stroke="${GRAPHITE}" stroke-width="1.4"/><circle cx="109.8" cy="34.2" r="2.3" fill="${GRAPHITE}"/><circle cx="110.6" cy="32.9" r=".8" fill="#fff"/>
+  <ellipse cx="102" cy="44.5" rx="3.4" ry="2.4" fill="${GRAPHITE}"/>
+  <path d="M98 48.5 Q102 50.5 106 48.5" fill="none" stroke="${GRAPHITE}" stroke-width="1.8" stroke-linecap="round"/>
+  <rect x="86" y="56" width="12" height="8" rx="4" fill="${PAPER}" stroke="${GRAPHITE}" stroke-width="2"/>
+  <rect x="106" y="56" width="12" height="8" rx="4" fill="${PAPER}" stroke="${GRAPHITE}" stroke-width="2"/>
+</svg>`;
+
 /** Paws over eyes: scanning on your device, not peeking. ~54x35 inline. */
 export const DOMINO_SCAN = `
 <svg width="54" height="35" viewBox="0 0 150 96" aria-hidden="true">

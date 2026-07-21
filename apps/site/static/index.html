@@ -85,7 +85,11 @@
 
         <div class="face face-unmask" id="face-unmask" role="tabpanel" aria-labelledby="tab-unmask" hidden>
           <label class="field-label" for="unmask-input">AI output</label>
-          <textarea id="unmask-input" rows="10" placeholder="Paste AI output that contains placeholders." spellcheck="false"></textarea>
+          <p class="status unmask-hint">Paste the AI’s reply. Placeholders — <code>Student A</code>, <code>School 1</code> — turn back into the real names from your map. Pure find-and-replace, entirely on this device.</p>
+          <div class="doc-wrap">
+            <span id="domino-unmask" aria-hidden="true"></span>
+            <textarea id="unmask-input" rows="10" placeholder="Paste AI output that contains placeholders." spellcheck="false"></textarea>
+          </div>
           <div class="actions">
             <button type="button" class="primary" id="btn-unmask" title="Restore the real names everywhere the AI kept the placeholders. Pure find-and-replace from your map, entirely on your device.">Unmask</button>
             <span class="status" id="unmask-status" role="status" aria-live="polite"></span>
