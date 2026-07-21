@@ -111,21 +111,63 @@ const TYPE_OPTIONS: Array<[PlaceholderType, string]> = [
 
 const GLYPH: Record<Flag['kind'], string> = { direct: '●', name: '◆', contextual: '▲' };
 
-// ---------- Domino ----------
+// ---------- Domino, the attention guide ----------
+// One raccoon, one job: perch on the right margin next to wherever the
+// professional should look next. Empty box -> peek over the paste area;
+// scanning -> eyes covered at the same spot; flags pending -> hop down to
+// the approve card; all reviewed -> hop to the copy row, paw on mask.
 
-const dominoPeek = $('domino-peek');
-const dominoScan = $('domino-scan');
-dominoPeek.innerHTML = DOMINO_PEEK;
-dominoScan.innerHTML = DOMINO_SCAN;
+const dominoGuide = $('domino-guide');
+let scanInFlight = false;
+type DominoState = 'doc' | 'scan' | 'review' | 'output' | 'hidden';
+let dominoState: DominoState = 'hidden';
 
-/** Peek over the empty paste box; duck away once a document is in play. */
-function updateDominoPeek(): void {
-  dominoPeek.hidden = !(docInput.value.trim().length === 0 && review.hidden);
-}
+function updateDomino(): void {
+  let state: DominoState;
+  if (document.body.classList.contains('mode-unmask')) state = 'hidden';
+  else if (!review.hidden) {
+    const pending = uiFlags.filter((f) => f.status === 'pending').length;
+    state = pending === 0 && uiFlags.length > 0 ? 'output' : 'review';
+  } else if (scanInFlight) state = 'scan';
+  else if (docInput.value.trim().length === 0) state = 'doc';
+  else state = 'hidden';
 
-/** Eyes covered while a scan runs: even the mascot doesn't look. */
-function setDominoScanning(scanning: boolean): void {
-  dominoScan.hidden = !scanning;
+  if (state === 'hidden') {
+    dominoGuide.hidden = true;
+    dominoState = state;
+    return;
+  }
+
+  const pose = state === 'scan' ? DOMINO_SCAN : state === 'output' ? DOMINO_DONE : DOMINO_PEEK;
+  if (dominoGuide.dataset['pose'] !== state) {
+    dominoGuide.innerHTML = pose;
+    dominoGuide.dataset['pose'] = state;
+  }
+
+  const card = $('card');
+  const cardTop = card.getBoundingClientRect().top;
+  let anchor: Element | null;
+  if (state === 'doc' || state === 'scan') anchor = docInput;
+  else if (state === 'review') anchor = document.querySelector('.summary-bar');
+  else anchor = document.querySelector('.output-head');
+  if (anchor === null) {
+    dominoGuide.hidden = true;
+    return;
+  }
+  const r = anchor.getBoundingClientRect();
+  const top =
+    state === 'doc' || state === 'scan'
+      ? r.bottom - cardTop - 56 // straddling the paste box's bottom edge
+      : r.top - cardTop - 52; // perched on the section's top edge
+  dominoGuide.hidden = false;
+  dominoGuide.style.top = `${Math.max(0, top)}px`;
+
+  if (dominoState !== state && dominoState !== 'hidden') {
+    dominoGuide.classList.remove('hop');
+    void dominoGuide.offsetWidth; // restart the animation
+    dominoGuide.classList.add('hop');
+  }
+  dominoState = state;
 }
 const KIND_LABEL: Record<Flag['kind'], string> = {
   direct: 'Direct identifier',
@@ -258,7 +300,7 @@ async function intakeFile(file: File): Promise<void> {
   } catch (err) {
     scanStatus.textContent = err instanceof Error ? err.message : 'Could not read that file.';
   }
-  updateDominoPeek();
+  updateDomino();
   syncCardHeight();
 }
 
@@ -312,12 +354,31 @@ Birthdate: 3/14/2008  Gender: F
 Address: 128 Chestnut Hill Lane
 Parent/Guardian: Robert Okafor  r.okafor@example.com
 
-GPA Summary
-Cumulative GPA (Weighted) 4.512
-2023-2024  Grade 11  Term 1
-AP Biology  A  5.0000  5
-AP US History  A  5.0000  5
-Honors Precalculus  A-  4.6700  5`,
+Cumulative GPA (4.0 scale): 3.67
+
+2023-2024  Grade 9
+English 9  A  1.0
+Algebra I  B  1.0
+Biology  A  1.0
+World History  A  1.0
+Spanish I  C  1.0
+Concert Choir  A  0.5
+
+2024-2025  Grade 10
+English 10  A  1.0
+Geometry  A  1.0
+Chemistry  B  1.0
+US History  A  1.0
+Spanish II  B  1.0
+Concert Choir  A  0.5
+
+2025-2026  Grade 11 — Term 1
+AP English Language  A  0.5
+Precalculus  A  0.5
+Anatomy & Physiology  A  0.5
+AP US History  B  0.5
+Spanish III  A  0.5
+Chamber Choir  A  0.25`,
   },
 ];
 
@@ -351,7 +412,7 @@ EXAMPLES.forEach((example, i) => {
         ? 'Loaded a fictional sample document; its names from earlier tries were cleared from your map so it scans fresh. Press Mask.'
         : 'Loaded a fictional sample document. Press Mask to see the review flow.';
     review.hidden = true;
-    updateDominoPeek();
+    updateDomino();
     syncCardHeight();
   });
 });
@@ -408,7 +469,8 @@ function runScan(): void {
     return;
   }
   scanId++;
-  setDominoScanning(true);
+  scanInFlight = true;
+  updateDomino();
   scanStatus.textContent = 'Scanning on your device…';
   nerWorker.postMessage({ type: 'scan', id: scanId, text: docText });
 }
@@ -418,13 +480,14 @@ $('btn-mask').addEventListener('click', () => {
   if (docText.trim().length === 0) {
     scanStatus.textContent = 'Paste a document to begin.';
     review.hidden = true;
-    updateDominoPeek();
+    updateDomino();
     syncCardHeight();
     return;
   }
   if (!modelReady && !modelFailed) {
     queuedScan = true;
-    setDominoScanning(true);
+    scanInFlight = true;
+    updateDomino();
     scanStatus.textContent = 'Waiting for the on-device name model, then scanning…';
     return;
   }
@@ -505,9 +568,21 @@ function finishScan(nameFlags: Flag[] | undefined): void {
       : `${n} flag${n === 1 ? '' : 's'} staged for your review. Click any highlight to act on it.${matchedNote}`;
 
   review.hidden = false;
-  setDominoScanning(false);
-  updateDominoPeek();
+  scanInFlight = false;
   renderAll();
+  // Bring the review into view: the guide has hopped to the approve card.
+  const bar = document.querySelector('.summary-bar');
+  if (bar !== null) {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const targetY = bar.getBoundingClientRect().top + window.scrollY - 12;
+    bar.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+    if (!reduceMotion) {
+      // Throttled tabs can stall smooth scrolling; make sure we arrive.
+      setTimeout(() => {
+        if (Math.abs(window.scrollY - targetY) > 200) window.scrollTo(0, targetY);
+      }, 700);
+    }
+  }
 }
 
 function approve(f: UIFlag): void {
@@ -713,6 +788,7 @@ function renderAll(): void {
   renderSummary();
   renderMappingStrip();
   syncCardHeight();
+  updateDomino();
 }
 
 function dismissedTargets(): Set<string> {
@@ -830,13 +906,6 @@ function renderSummary(): void {
   pendingSpan.className = 'count-pending';
   pendingSpan.textContent = pending === 0 ? 'all reviewed' : `${pending} pending`;
   summaryCounts.append(pendingSpan);
-  if (pending === 0 && uiFlags.length > 0) {
-    const done = document.createElement('span');
-    done.className = 'domino-done';
-    done.setAttribute('aria-hidden', 'true');
-    done.innerHTML = DOMINO_DONE;
-    summaryCounts.append(done);
-  }
 
   const approveAll = $<HTMLButtonElement>('btn-approve-all');
   approveAll.disabled = pending === 0;
@@ -1132,13 +1201,98 @@ function renderMappingStrip(): void {
   const w = map.watchlist.length;
   if (n === 0 && a === 0 && w === 0) {
     mappingCount.textContent = 'No map yet.';
+  } else {
+    const parts = [`${n} mapped`];
+    if (a > 0) parts.push(`${a} alias${a === 1 ? '' : 'es'}`);
+    if (w > 0) parts.push(`${w} always-flag`);
+    mappingCount.textContent = `Map: ${parts.join(', ')} — on this device.`;
+  }
+  if (!mapView.hidden) renderMapView();
+}
+
+// ---------- map viewer ----------
+
+const mapView = $('map-view');
+const mapEntries = $<HTMLUListElement>('map-entries');
+
+function renderMapView(): void {
+  mapEntries.textContent = '';
+  const rows: Array<{ real: string; ph: string; alias: boolean }> = [
+    ...Object.entries(map.mapping).map(([real, ph]) => ({ real, ph, alias: false })),
+    ...Object.entries(map.aliases).map(([real, ph]) => ({ real, ph, alias: true })),
+  ].sort((a, b) => a.ph.localeCompare(b.ph, undefined, { numeric: true }) || Number(a.alias) - Number(b.alias));
+
+  if (rows.length === 0) {
+    const li = document.createElement('li');
+    li.className = 'map-entry map-entry-empty';
+    li.textContent = 'Nothing mapped yet.';
+    mapEntries.append(li);
     return;
   }
-  const parts = [`${n} mapped`];
-  if (a > 0) parts.push(`${a} alias${a === 1 ? '' : 'es'}`);
-  if (w > 0) parts.push(`${w} always-flag`);
-  mappingCount.textContent = `Map: ${parts.join(', ')} — on this device.`;
+  for (const row of rows) {
+    const li = document.createElement('li');
+    li.className = 'map-entry';
+    const real = document.createElement('span');
+    real.className = 'map-real';
+    real.textContent = row.real;
+    const arrow = document.createElement('span');
+    arrow.className = 'map-arrow';
+    arrow.textContent = '→';
+    const ph = document.createElement('code');
+    ph.className = 'ph-chip';
+    ph.textContent = row.ph;
+    li.append(real, arrow, ph);
+    if (row.alias) {
+      const tag = document.createElement('span');
+      tag.className = 'map-alias-tag';
+      tag.textContent = 'alias';
+      li.append(tag);
+    }
+    const remove = document.createElement('button');
+    remove.type = 'button';
+    remove.className = 'chip-x';
+    remove.textContent = '×';
+    remove.setAttribute('aria-label', `Delete ${row.real}`);
+    remove.title = row.alias
+      ? 'Remove this alias (always safe)'
+      : 'Delete this entry — documents already masked with it can no longer be unmasked here';
+    remove.addEventListener('click', () => {
+      if (row.alias) {
+        delete map.aliases[row.real];
+      } else {
+        const dependents = Object.values(map.aliases).filter((p) => p === row.ph).length;
+        const aliasNote = dependents > 0 ? ` Its ${dependents} alias${dependents === 1 ? '' : 'es'} will be removed too.` : '';
+        if (
+          !confirm(
+            `Delete “${row.real} → ${row.ph}”? Documents already masked with it can no longer be unmasked on this device.${aliasNote}`,
+          )
+        ) {
+          return;
+        }
+        delete map.mapping[row.real];
+        for (const [aReal, aPh] of Object.entries(map.aliases)) {
+          if (aPh === row.ph) delete map.aliases[aReal];
+        }
+      }
+      sessionAdded.delete(row.real);
+      // The text is no longer masked; its flags must say so.
+      for (const f of uiFlags) {
+        if (f.target === row.real && f.status === 'approved') f.status = 'pending';
+      }
+      saveMap();
+      renderMapView();
+      renderMappingStrip();
+      if (!review.hidden) renderAll();
+    });
+    li.append(remove);
+    mapEntries.append(li);
+  }
 }
+
+$('btn-view-map').addEventListener('click', () => {
+  mapView.hidden = !mapView.hidden;
+  if (!mapView.hidden) renderMapView();
+});
 
 $('btn-export').addEventListener('click', () => {
   const studentReal = Object.entries(map.mapping).find(([, ph]) => ph === 'Student A')?.[0];
@@ -1203,9 +1357,12 @@ $('btn-clear').addEventListener('click', () => {
 setMode('mask');
 renderWatchlist();
 renderMappingStrip();
-docInput.addEventListener('input', updateDominoPeek);
-updateDominoPeek();
-window.addEventListener('resize', syncCardHeight);
+docInput.addEventListener('input', updateDomino);
+updateDomino();
+window.addEventListener('resize', () => {
+  syncCardHeight();
+  updateDomino();
+});
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {

@@ -44,12 +44,10 @@
             <input type="file" id="file-input" accept=".pdf,.docx,.txt,.md" hidden>
           </div>
           <div class="doc-wrap">
-            <span id="domino-peek" hidden aria-hidden="true"></span>
             <textarea id="doc-input" rows="10" placeholder="Paste a document to begin, or drop in a PDF or Word file." spellcheck="false"></textarea>
           </div>
           <div class="actions">
             <button type="button" class="primary" id="btn-mask" title="Scan the document on your device and stage replacements for your review. Nothing is masked until you approve it, and nothing leaves your browser.">Mask</button>
-            <span id="domino-scan" hidden aria-hidden="true"></span>
             <span class="status" id="scan-status" role="status" aria-live="polite"></span>
           </div>
           <p class="status model-status" id="model-status" role="status" aria-live="polite">Preparing the on-device name model…</p>
@@ -82,6 +80,7 @@
               </div>
             </div>
           </div>
+          <span id="domino-guide" hidden aria-hidden="true"></span>
         </div>
 
         <div class="face face-unmask" id="face-unmask" role="tabpanel" aria-labelledby="tab-unmask" hidden>
@@ -112,13 +111,16 @@
         </span>
       </div>
       <div class="mapping-row">
-        <span id="mapping-count">No map yet.</span>
+        <button type="button" class="linklike" id="btn-view-map" title="View every entry in your map"><span id="mapping-count">No map yet.</span></button>
         <div class="mapping-actions">
           <button type="button" id="btn-export">Export mapping</button>
           <button type="button" id="btn-import">Import mapping</button>
           <input type="file" id="import-file" accept=".json,application/json" hidden>
           <button type="button" id="btn-clear">Clear mapping</button>
         </div>
+      </div>
+      <div id="map-view" hidden>
+        <ul class="map-entries" id="map-entries"></ul>
       </div>
       <p class="mapping-note">The map file — placeholders, aliases, and your always-flag list — is the only sensitive artifact NameMasker creates. It is what makes Unmask work. Keep it with your student files; it is never transmitted.</p>
     </div>
