@@ -96,9 +96,12 @@ server on the other end. There is nothing to send to.
 Most of the work is deliberately old-fashioned: find and replace. "Maya
 Chen" becomes "Student A" the same way your word processor would do it — no
 cleverness, perfectly reversible. One part does use AI: finding the names.
-It's a small language model your browser downloads once and runs by itself,
-like a spell-checker. It reads your document on your computer, and nothing
-is sent out to be read.
+It's DistilBERT (link: huggingface.co/dslim/distilbert-NER), a small
+open-source language model tuned for exactly one skill — spotting names —
+that your browser downloads once and runs by itself, like a spell-checker.
+It reads your document on your computer, and nothing is sent out to be
+read. We name the model on purpose: a named model can be looked up and
+audited.
 
 A promise is only worth what you can check. Four ways, easiest first:
 

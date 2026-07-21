@@ -215,7 +215,7 @@
       <p class="promise-sig">— Chris</p>
     </div>
     <p>Here’s how that can be true. NameMasker is a website, but it doesn’t work like one. A normal website sends what you type to a server; this page, once loaded, sends nothing anywhere. Every step — finding names, masking them, restoring them — happens in your browser, on your machine. There is no server on the other end. There is nothing to send to.</p>
-    <p>Most of the work is deliberately old-fashioned: find and replace. “Maya Chen” becomes “Student A” the same way your word processor would do it — no cleverness, perfectly reversible. One part does use AI: finding the names. It’s a small language model your browser downloads once and runs by itself, like a spell-checker. It reads your document on your computer, and nothing is sent out to be read.</p>
+    <p>Most of the work is deliberately old-fashioned: find and replace. “Maya Chen” becomes “Student A” the same way your word processor would do it — no cleverness, perfectly reversible. One part does use AI: finding the names. It’s <a href="https://huggingface.co/dslim/distilbert-NER">DistilBERT</a>, a small open-source language model tuned for exactly one skill — spotting names — that your browser downloads once and runs by itself, like a spell-checker. It reads your document on your computer, and nothing is sent out to be read. We name the model on purpose: a named model can be looked up and audited.</p>
     <p>A promise is only worth what you can check. Four ways, easiest first:</p>
     <ol>
       <li><strong>Turn off your internet.</strong> Load the page, disconnect, and use the tool. It works fully offline because nothing it does requires a server.</li>
