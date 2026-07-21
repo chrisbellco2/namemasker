@@ -54,6 +54,4 @@ export const DOMINO_DONE = `
   <ellipse cx="57" cy="38.5" rx="4.6" ry="4.3" fill="#fff"/><circle cx="56.2" cy="39.2" r="2.2" fill="${GRAPHITE}"/><circle cx="57" cy="37.9" r=".8" fill="#fff"/>
   <ellipse cx="50" cy="48.5" rx="3" ry="2.2" fill="${GRAPHITE}"/>
   <path d="M46.5 52.5 Q50 54.5 53.5 52.5" fill="none" stroke="${GRAPHITE}" stroke-width="1.8" stroke-linecap="round"/>
-  <ellipse cx="70" cy="40" rx="5.5" ry="4.5" fill="${PAPER}" stroke="${GRAPHITE}" stroke-width="2"/>
-  <path d="M67 37 L67 43 M70 36.5 L70 43.5 M73 37 L73 43" stroke="${GRAPHITE}" stroke-width="1" opacity=".5"/>
 </svg>`;
