@@ -215,7 +215,8 @@ textarea.dropping {
 }
 #domino-guide.hop svg { animation: domino-hop 0.55s ease-out both; }
 
-.summary-bar { scroll-margin-top: 12px; }
+.summary-bar,
+.banner { scroll-margin-top: 12px; }
 
 .tail-underline { display: block; margin: -2px 0 10px; }
 

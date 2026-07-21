@@ -123,6 +123,7 @@ type DominoState = 'doc' | 'scan' | 'review' | 'output' | 'hidden';
 let dominoState: DominoState = 'hidden';
 
 function updateDomino(): void {
+  if (dominoGuide === null) return; // the mascot must never take down the tool
   let state: DominoState;
   if (document.body.classList.contains('mode-unmask')) state = 'hidden';
   else if (!review.hidden) {
@@ -570,8 +571,9 @@ function finishScan(nameFlags: Flag[] | undefined): void {
   review.hidden = false;
   scanInFlight = false;
   renderAll();
-  // Bring the review into view: the guide has hopped to the approve card.
-  const bar = document.querySelector('.summary-bar');
+  // Bring the review into view: the accumulation banner when it fired
+  // (the first thing worth reading), otherwise the approve card.
+  const bar = accumBanner.hidden ? document.querySelector('.summary-bar') : accumBanner;
   if (bar !== null) {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const targetY = bar.getBoundingClientRect().top + window.scrollY - 12;
@@ -1365,6 +1367,17 @@ window.addEventListener('resize', () => {
 });
 
 if ('serviceWorker' in navigator) {
+  // When a NEW service worker takes over an already-controlled page, the
+  // running script may predate the freshly-cached assets. One reload
+  // guarantees the page and its script always match. First visits (no
+  // prior controller) never reload.
+  const hadController = navigator.serviceWorker.controller !== null;
+  let refreshed = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!hadController || refreshed) return;
+    refreshed = true;
+    window.location.reload();
+  });
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('sw.js').catch(() => {
       /* offline support is progressive; the tool works without it */
