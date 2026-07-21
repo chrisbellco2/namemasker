@@ -144,6 +144,26 @@ const RULES: RuleDef[] = [
     ],
   },
   {
+    category: 'gender-identity',
+    weight: 3,
+    reason:
+      'Gender or identity disclosure — may identify the student, and is sensitive in itself; whether to share this at all is your judgment',
+    placeholderType: 'other',
+    patterns: [
+      /\b(?:transgender|nonbinary|non-binary|genderqueer|genderfluid|two-spirit|agender)\b/gi,
+      /\btrans\b/gi,
+      /\bcame\s+out\s+as\b/gi,
+    ],
+  },
+  {
+    category: 'uncommon-pronoun',
+    weight: 3,
+    reason:
+      'Uncommon pronouns may identify a specific student, and masking them can change meaning — your judgment',
+    placeholderType: 'other',
+    patterns: [/\b(?:ze|zir|zirs|xe|xem|xyr|fae|faer)\b/gi],
+  },
+  {
     category: 'anchoring-year',
     weight: 1,
     reason: 'Anchoring year; identifying only when stacked with other signals',

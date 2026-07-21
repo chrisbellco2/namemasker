@@ -47,6 +47,25 @@ const RULES: DirectRule[] = [
     ],
   },
   {
+    // A gender marker alone narrows weakly; stacked with a record's other
+    // fields it narrows hard — and an X/NB marker can narrow to one student.
+    category: 'gender-marker',
+    placeholderType: 'other',
+    reason: 'Gender marker (deterministic pattern)',
+    patterns: [
+      /\b(?:gender|sex)\s*[:=]\s*(?:F|M|X|NB|Female|Male|Nonbinary|Non-binary|Intersex)\b/gi,
+    ],
+  },
+  {
+    category: 'pronoun-declaration',
+    placeholderType: 'other',
+    reason: 'Pronoun declaration (deterministic pattern)',
+    patterns: [
+      /\(\s*(?:she|he|they|ze|xe|ey|fae)\s*\/\s*[a-z]+(?:\s*\/\s*[a-z]+)?\s*\)/gi,
+      /\bpronouns?\s*[:=]\s*[a-z]+\s*\/\s*[a-z]+(?:\s*\/\s*[a-z]+)?/gi,
+    ],
+  },
+  {
     category: 'date',
     placeholderType: 'date',
     reason: 'Date (deterministic pattern)',

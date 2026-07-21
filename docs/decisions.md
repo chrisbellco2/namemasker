@@ -229,3 +229,30 @@ known name. (3) Phones without separators (3035551212, 13035551212) now
 match, and the labeled-ID rule moved ahead of phone so 10-digit student
 numbers keep the ID label. Published as @namemasker/core 0.2.0; the dash
 pins it exact and runs a parity harness before switching detectors.
+
+## 18. Gender de-identification, detection tier (2026-07-21)
+
+Chris's direction after discussion. Shipped now, all additive with corpus
+tests: labeled gender/sex fields and pronoun declarations ("(she/her)",
+"Pronouns: ze/zir") as deterministic direct-layer rules; gender/identity
+disclosures (transgender, nonbinary, standalone "trans", "came out as" —
+which also catches orientation disclosures, and the reason says so) and
+unambiguous neopronouns in prose (ze/zir/xe/xem/xyr/fae/faer,
+conservative list, grown by corpus case) as weight-3 contextual rules
+whose stated reason makes the dual point: may identify, and is sensitive
+in itself — sharing at all is the professional's judgment. Deliberate
+non-goals, documented: binary pronouns in prose are never flagged (half
+the population, and flagging every "she" trains users to ignore flags);
+singular-they detection is not attempted (unreliable; false confidence is
+worse than a stated limit).
+
+Parked as one future exploration, "pronoun tools": opt-in outbound
+neutralization (she->they for everyone; k-anonymity instinct, Chris's)
+and inbound re-gendering (they->she on the AI's reply). Key design
+insight recorded: re-gendering is most tractable BEFORE Unmask, while the
+student is still unambiguously tokenized as "Student A", with target
+pronouns as a future map field. Both are one-way flagged transforms,
+never part of Mask/Unmask's pure substitution; local implementation
+paths, ascending quality: rules+review flags, the browser's built-in
+on-device AI where present, or the charter's optional local-LLM tier.
+Core bumped to 0.3.0 (npm publish pending Chris's next interactive auth).

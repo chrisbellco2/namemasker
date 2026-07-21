@@ -43,6 +43,22 @@ describe('direct layer: IDs', () => {
   });
 });
 
+describe('direct layer: gender markers and pronoun declarations (corpus: gender pass)', () => {
+  it.each(['Gender: F', 'Sex: M', 'Gender: Nonbinary', 'Gender: X'])('detects the field %s', (field) => {
+    expect(categories(`Birthdate: on file  ${field}  Grade: 11`)).toContain('gender-marker');
+  });
+  it.each(['Imani (she/her) will attend.', 'Imani (ze/zir) will attend.', 'Pronouns: they/them'])(
+    'detects the declaration in %s',
+    (text) => {
+      expect(categories(text)).toContain('pronoun-declaration');
+    },
+  );
+  it('does not fire on prose mentions of the words', () => {
+    const flags = detectDirect('The gender studies elective covers sex education policy.');
+    expect(flags.some((f) => f.category === 'gender-marker')).toBe(false);
+  });
+});
+
 describe('direct layer: dates', () => {
   it.each(['March 3, 2024', '3/14/2008', '2024-03-12', '12 March 2024'])('detects %s', (date) => {
     expect(categories(`Born ${date}.`)).toContain('date');

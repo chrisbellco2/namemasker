@@ -60,6 +60,37 @@ describe('contextual rules: individual signals', () => {
   });
 });
 
+describe('gender-identity and uncommon-pronoun rules (corpus: gender pass)', () => {
+  const signalCategories = (text: string) => collectSignals(text).map((s) => s.category);
+
+  it.each(['She is transgender.', 'a trans athlete on the team', 'since coming out — she came out as bi last spring', 'a nonbinary student leader'])(
+    'sees gender-identity in %s',
+    (text) => {
+      expect(signalCategories(text)).toContain('gender-identity');
+    },
+  );
+
+  it('gender-identity flags alone at weight 3', () => {
+    const { flags } = detectContextual('The student is nonbinary.');
+    expect(flags.some((f) => f.category === 'gender-identity')).toBe(true);
+    expect(flags[0]!.reason).toMatch(/your judgment/);
+  });
+
+  it('never fires inside transcript or transfer (false-positive restraint)', () => {
+    const cats = signalCategories('Her transcript shows she transferred schools during the transition to senior year.');
+    expect(cats).not.toContain('gender-identity');
+  });
+
+  it('sees uncommon pronouns in prose', () => {
+    const { flags } = detectContextual('Ze finished zir essay early.');
+    expect(flags.some((f) => f.category === 'uncommon-pronoun')).toBe(true);
+  });
+
+  it('does not fire inside larger words like faerie', () => {
+    expect(signalCategories('The faerie play was a hit; the xylophone solo too.')).not.toContain('uncommon-pronoun');
+  });
+});
+
 describe('the Fairview list-continuation rule', () => {
   it('flags a suffixless school continuing a list begun by a detected school', () => {
     const signals = collectSignals('She comes from Boulder High, but also went to South High, and Fairview.');
